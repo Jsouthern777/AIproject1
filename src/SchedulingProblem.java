@@ -3,16 +3,17 @@ import java.util.List;
 
 /**
  * What we need:
- * Varaiables: Hours
- * Values: People
+ * Variables: Hours/Shifts (number is randomized)
+ * Values: People (number is randomized)
  * Constraints: No more than 8 consecutive hours, 12 hours between consecutive shifts, random availability
- * Number of employees required will be randomized
- * Number of shifts per day will be randomized
  */
 public class SchedulingProblem {
-    //List of employees that will be of random length
-    private ArrayList<List> employees;
-    //List of required shifts that will be of random length
-    private ArrayList<List> shifts;
+    //List of employees that will be of random length.
+    //employees.get(i) is an unmodifiable list containing that employee's availability
+    private ArrayList<List<Integer>> employees; //people (values)
+
+    //list of required shifts/hours
+    //shifts.get(i) gives you the employee assigned to that hour (0 = no one is assigned)
+    private ArrayList<Integer> shifts;
 
 }
