@@ -12,8 +12,17 @@ public class SchedulingProblem {
     //employees.get(i) is an unmodifiable list containing that employee's availability
     private ArrayList<List<Integer>> employees; //people (values)
 
-    //list of required shifts/hours
-    //shifts.get(i) gives you the employee assigned to that hour (0 = no one is assigned)
-    private ArrayList<Integer> shifts;
+    private int numShifts;
+    //hour number of the first shift (for employee availability checking)
+    private int startTime;
 
+    private int numEmployees;
+
+    public SchedulingProblem(final int numShifts, final int startTime, final int numEmployees, ArrayList<List<Integer>> employees){
+        this.numShifts = numShifts;
+        this.startTime = startTime;
+        this.numEmployees = numEmployees;
+        this.employees = employees;
+    }
 }
+
