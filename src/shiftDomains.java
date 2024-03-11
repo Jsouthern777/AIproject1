@@ -13,13 +13,16 @@ public class shiftDomains {
         }
     }
 
-    public shiftDomains(final int numShifts, ArrayList<List<Integer>> employees){
+    //somehow check which employees are available for each hour of the shift...
+    public shiftDomains(final int startTime, final int numShifts, ArrayList<List<Integer>> employees){
         shiftDomains = new ArrayList<ArrayList<Integer>>();
-        for(int varIndex = 0; varIndex < numShifts; varIndex++){
-            ArrayList<Integer> nextShift = new ArrayList<>();
+        for(int hour = startTime; hour < numShifts; hour++){
+            ArrayList<Integer> nextHour = new ArrayList<>();
+            for()
             //TODO: initialize shift domains
-
+            //For each hour,
         }
+        //shiftDomains.add(nextVar)
     }
     @Override
     public String toString() {
