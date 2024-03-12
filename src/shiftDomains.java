@@ -14,16 +14,22 @@ public class shiftDomains {
     }
 
     //somehow check which employees are available for each hour of the shift...
+    //would it make sense to have all employees at first and then make that consistent (change availabilities) after?
     public shiftDomains(final int startTime, final int numShifts, ArrayList<List<Integer>> employees){
         shiftDomains = new ArrayList<ArrayList<Integer>>();
         for(int hour = startTime; hour < numShifts; hour++){
+            //if(employee.get(hour) is true, add to domain
             ArrayList<Integer> nextHour = new ArrayList<>();
-            for()
+            for(int i = 0; i < employees.size(); i++){
+               // if(employees.get(i).get(hour)){
+
+                }
+            }
             //TODO: initialize shift domains
             //For each hour,
         }
         //shiftDomains.add(nextVar)
-    }
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder("Variable\tPossible Values\n");
@@ -34,4 +40,6 @@ public class shiftDomains {
         }
         return result.toString();
     }
-}
+    }
+
+

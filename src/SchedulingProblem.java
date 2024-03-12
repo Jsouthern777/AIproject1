@@ -10,7 +10,7 @@ import java.util.List;
 public class SchedulingProblem {
     //List of employees that will be of random length.
     //employees.get(i) is an unmodifiable list containing that employee's availability
-    private ArrayList<List<Boolean>> employees; //people (values)
+    private ArrayList<ArrayList<Boolean>> employees; //people (values)
 
     private int numShifts;
     //hour number of the first shift (for employee availability checking)
@@ -18,19 +18,30 @@ public class SchedulingProblem {
 
     private int numEmployees;
 
-    public SchedulingProblem(final int numShifts, final int startTime, final int numEmployees, ArrayList<List<Boolean>> employees){
+    public SchedulingProblem(final int numShifts, final int startTime, final int numEmployees){
         this.numShifts = numShifts;
         this.startTime = startTime;
         this.numEmployees = numEmployees;
-        this.employees = employees;
+        employees = new ArrayList<>();
+        for(int i = 0; i < numEmployees; i++){
+            ArrayList<Boolean> boolList = new ArrayList<>();
+            employees.add(boolList);
+        }
+        System.out.println(employees.size());
 
         generateAvailability(numShifts,startTime,employees);
+        for(int i = 0; i < employees.size(); i++){
+            System.out.println("employee: " + i);
+            System.out.println(employees.get(i));
+        }
 
     }
 //Generates random availability for each employee for the shift duration
-    public static void generateAvailability(final int numShifts, final int startTime, ArrayList<List<Boolean>> employees){
-        for(int i = 0; i < employees.size()-1; i++){
-            for(int j = startTime; j <= numShifts; j++){
+    public static void generateAvailability(final int numShifts, final int startTime, ArrayList<ArrayList<Boolean>> employees){
+        for(int i = 0; i < employees.size(); i++){
+
+            for(int j = startTime; j <= startTime + numShifts; j++){
+
                 employees.get(i).add(Math.random()<0.5);
             }
         }
