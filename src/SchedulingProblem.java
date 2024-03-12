@@ -8,6 +8,10 @@ import java.util.List;
  * Constraints: No more than 8 consecutive hours, 12 hours between consecutive shifts, random availability
  */
 public class SchedulingProblem {
+    public ArrayList<ArrayList<Boolean>> getEmployees() {
+        return employees;
+    }
+
     //List of employees that will be of random length.
     //employees.get(i) is an unmodifiable list containing that employee's availability
     private ArrayList<ArrayList<Boolean>> employees; //people (values)
@@ -34,6 +38,8 @@ public class SchedulingProblem {
             System.out.println("employee: " + i);
             System.out.println(employees.get(i));
         }
+        shiftDomains startDomains = new shiftDomains(startTime, numShifts, employees);
+
 
     }
 //Generates random availability for each employee for the shift duration
