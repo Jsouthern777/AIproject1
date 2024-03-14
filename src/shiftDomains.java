@@ -6,6 +6,7 @@ public class shiftDomains {
     //shiftDomains.get(i) contains the possible values (people) for variable i (hour i)
     public ArrayList<ArrayList<Integer>> shiftDomains;
 
+    //deep copy constructor
     public shiftDomains(final shiftDomains otherDomains) {
         shiftDomains = new ArrayList<ArrayList<Integer>>();
         for(int i = 0; i < otherDomains.shiftDomains.size(); i++){

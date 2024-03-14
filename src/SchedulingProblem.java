@@ -52,5 +52,8 @@ public class SchedulingProblem {
             }
         }
     }
+
+    public int getNumShifts(){return numShifts;}
+
 }
 
