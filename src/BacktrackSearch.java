@@ -73,7 +73,7 @@ public class BacktrackSearch {
             return false;
         }
 
-        //basically the MRV portion
+        //basically the MRV portion!
         public static int assignNextHour(final SchedulingProblem prob, final shiftDomains domains){
             //TODO: use MRV to get the next variable
             int maxValue = -1;
