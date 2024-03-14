@@ -8,7 +8,8 @@ public class Solver {
         ArrayList<ArrayList<Boolean>> employees = prob.getEmployees(); //you need to access the list of employees + availabilities from prob
         shiftDomains startDomains = new shiftDomains(0, 10,employees);
         System.out.println(startDomains.toString()); //for testing
-        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains,0);
+        ArrayList<Integer> assignedShifts = new ArrayList<>();
+        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains,assignedShifts);
         //Andrew, call your search function here on the same startDomain
         if(result1 != null){ //result2 (Andrew's search) will need to be checked too
             System.out.println(result1);
