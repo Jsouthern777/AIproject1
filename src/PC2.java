@@ -57,7 +57,7 @@ final static int maxConsecutiveHours = 8;
                 }
             }
             else{ //The number of shifts is too low so add all neighbors
-                for(int i = 0; i < problem.getNumShifts()){
+                for(int i = 0; i < problem.getNumShifts(); i++){
                     if(nextHourToAssign != i){
                         neighbors.add(i);
                     }
