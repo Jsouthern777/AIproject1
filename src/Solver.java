@@ -19,8 +19,9 @@ public class Solver {
 
         //Begin instance of Jackson's backtracking MRV search
         ArrayList<Integer> assignedShifts = new ArrayList<>();
+        //initialize assignedShifts to allow setting each hour
         for(int i = 1; i <= numShifts; i++){
-            assignedShifts.add(-1);
+            assignedShifts.add(i);
         }
         shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains,assignedShifts);
 
