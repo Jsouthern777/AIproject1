@@ -12,7 +12,7 @@ public class SchedulingProblem {
     private int numShifts;
     private int numEmployees;
     private ArrayList<List<Integer>> shiftAssignments;
-    private int hoursBetweenShifts;
+    private int minBetweenShifts;
     private int maxConsecutiveHours;
 
 
@@ -20,7 +20,7 @@ public class SchedulingProblem {
     public SchedulingProblem(final int numShifts, final int numEmployees, final int hoursBetweenShifts, final int maxConsecutiveHours){
         this.numShifts = numShifts;
         this.numEmployees = numEmployees;
-        this.hoursBetweenShifts = hoursBetweenShifts;
+        this.minBetweenShifts = hoursBetweenShifts;
         this.maxConsecutiveHours = maxConsecutiveHours;
     }
 
@@ -29,10 +29,15 @@ public class SchedulingProblem {
         this.numShifts = numShifts;
         this.numEmployees = numEmployees;
         maxConsecutiveHours = 8;
-        hoursBetweenShifts = 12;
+        minBetweenShifts = 12;
     }
 
     public int getNumShifts(){return numShifts;}
+
+    public int getMinBetweenShifts(){return minBetweenShifts;}
+
+    public int getMaxConsecutiveHours(){return maxConsecutiveHours;}
+
 
 }//end SchedulingProblem
 

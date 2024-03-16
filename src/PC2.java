@@ -2,16 +2,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PC2 {
-    
-final static int hoursBetweenShifts = 12;
-final static int maxConsecutiveHours = 8;
-    
+       
     public static shiftDomains backtrackPC2(final SchedulingProblem  problem, final shiftDomains domains, final int nextHourToAssign){
         
         //if assignment is complete then return the assignments
         if (nextHourToAssign == problem.getNumShifts()){
             return domains;
         }
+        int hoursBetweenShifts = problem.getMinBetweenShifts();
+        int maxConsecutiveHours = problem.getMaxConsecutiveHours();
 
         shiftDomains domainCopy = new shiftDomains(domains);
         List<Integer> neighbors = new ArrayList<>();
