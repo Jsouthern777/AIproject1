@@ -6,29 +6,52 @@ import java.util.ArrayList;
 public class Solver {
 //same problem will be solved multiple times by both algorithms, so generate availabilities,
 // numEmployees, numShifts, and startTime here
-    public static boolean runInstance(final int numShifts, final int numEmployees, final int verbosity){//, String connectionsFilename) throws IOException{
-        SchedulingProblem prob = new SchedulingProblem(numShifts, 0, numEmployees);
-        ArrayList<ArrayList<Boolean>> employees = prob.getEmployees(); //you need to access the list of employees + availabilities from prob
-        shiftDomains startDomains = new shiftDomains(0, 10,employees);
+    public static void runInstance(final int numShifts, final int numEmployees, String availabilitiesFilename) throws IOException{
+        
+        //Initialize the problem
+        SchedulingProblem prob = new SchedulingProblem(numShifts, numEmployees);
+
+        //Initialize the domains from the input file
+        shiftDomains startDomains = new shiftDomains(numShifts, numEmployees, availabilitiesFilename);
+
         System.out.println(startDomains.toString()); //for testing
+
+
+        //Begin instance of Jackson's backtracking MRV search
         ArrayList<Integer> assignedShifts = new ArrayList<>();
         shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains,assignedShifts);
-        //Andrew, call your search function here on the same startDomain
-        if(result1 != null){ //result2 (Andrew's search) will need to be checked too
-            System.out.println(result1);
-            return true;
+
+        //checks the success of the backtracking MRV solver and prints the result
+        if(result1 != null){
+            System.out.println("Result of backtracking MRV:\n" + result1);
         }
         else{
-            System.out.println("No solution found for result 1");
-            return false;
+            System.out.println("No solution found for backtracking MRV");
         }
+
+        
+        //Begin instance of Andrew's simple backtracking search using PC2
+        int firstHour = 0;
+        shiftDomains result2 = PC2.backtrackPC2(prob, startDomains, firstHour);
+
+
+        //checks the success of the backtracking PC2 solver and prints the result
+        if(result2 != null){ 
+            System.out.println(result2);
+        }
+        else{
+            System.out.println("No solution found for PC2");
+        }
+
+
+
     }
 
 
 
 
     public static void main(String[] args) throws IOException{
-        runInstance(10,20, 1);//, "test1.txt");
+        runInstance(10,5, "5E 10S.txt");
     }
 
 

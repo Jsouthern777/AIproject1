@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 public class shiftDomains {
     //shiftDomains contains one ArrayList for each variable
@@ -16,23 +18,48 @@ public class shiftDomains {
 
     //somehow check which employees are available for each hour of the shift...
     //would it make sense to have all employees at first and then make that consistent (change availabilities) after?
-    public shiftDomains(final int startTime, final int numShifts, ArrayList<ArrayList<Boolean>> employees){
+    public shiftDomains(final int numShifts, final int numEmployees, final String availabilitesFilepath){
         shiftDomains = new ArrayList<ArrayList<Integer>>();
-        for(int hour = startTime; hour < numShifts; hour++){
-            //if(employee.get(hour) is true, add to domain
-            ArrayList<Integer> availableEmployees = new ArrayList<>();
-            for(int employeeIndex = 0; employeeIndex < employees.size(); employeeIndex++){
-               if(employees.get(employeeIndex).get(hour)){
-                   availableEmployees.add(employeeIndex);
-               }
+        
+		for (int varIndex=0; varIndex<numShifts; varIndex++) {
+			// add a mutable list for now; then convert to unmodifiable after they are built
+			shiftDomains.add(new ArrayList<Integer>());
+		}
 
-                }
-            shiftDomains.add(availableEmployees);
-            }
-            //TODO: initialize shift domains
-            //For each hour,
-        }
-        //shiftDomains.add(nextVar)
+		Scanner scn = new Scanner(availabilitesFilepath);
+		while (scn.hasNextInt()) {
+			final int var1 = scn.nextInt(); //employee number
+			final int var2 = scn.nextInt(); //shift number
+
+			if (var1 < 0 || var1 >= numEmployees) {
+				throw new IllegalArgumentException(
+						"Invalid shift domain input file: Employee " + var1 + " is out of bounds [0," + (numEmployees-1) + "]");
+			}
+			if (var2 < 0 || var2 >= numShifts) {
+				throw new IllegalArgumentException(
+						"Invalid shift domain input file: Shift " + var2 + " is out of bounds [0," + (numShifts-1) + "]");
+			}
+
+            //Add the employee to the shifts that they are available for
+			shiftDomains.get(var2).add(var1);
+		}//end while
+        
+		if (scn.hasNext()) {
+			throw new IllegalArgumentException("Invalid shift domain input file: non-numeric value: " + scn.next());
+		}
+		scn.close();
+
+        /* REMOVED SAFETY FACTOR
+		// Make the connections lists unmodifiable
+		// This allows us to safely return iterators to those collections, since we know the
+		// iterator cannot be used to change our private data!
+		for (int varIndex=0; varIndex<numShifts; varIndex++) {
+			shiftDomains.set(varIndex, Collections.unmodifiableList(shiftDomains.get(varIndex)));
+		}
+        */
+
+
+    }
 
     @Override
     public String toString() {
@@ -43,6 +70,7 @@ public class shiftDomains {
         }
         return result.toString();
     }
-    }
+
+    }//end class
 
 
