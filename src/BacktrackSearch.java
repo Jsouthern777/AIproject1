@@ -22,12 +22,14 @@ public class BacktrackSearch {
 
             int hourToAssign = assignNextHour(domains, assignedShifts);
            // System.out.println("hour to assign: " + hourToAssign);
+            System.out.println(domains);
             for(int value: domains.shiftDomains.get(hourToAssign)){
                 System.out.println("Hour to Assign: " + hourToAssign + " value: " + value);
                 assignedShifts.set(hourToAssign, value);
+                printShifts(assignedShifts);
                // System.out.println("assignedShifts size: " + assignedShifts.size());
                 if(isConsistent(domains, assignedShifts)){
-                  //  System.out.println("consistency check");
+                    //System.out.println("consistency found!");
                     //System.out.println("consistency found");
                     shiftDomains newDomains = new shiftDomains(domains);
                     newDomains.shiftDomains.get(hourToAssign).clear();
@@ -52,25 +54,70 @@ public class BacktrackSearch {
             return null;
         }
 
+        public static void printShifts(ArrayList<Integer> assignedShifts){
+            System.out.println("Printing  assigned shifts: ");
+            for(int i = 0; i < assignedShifts.size(); i++){
+                System.out.println(assignedShifts.get(i));
+            }
+        }
+
         //Constraints:
         // 1) No more than 8 hours consecutively for one person
-        // 2) After working for at max 8 shifts consecutively,
+        // 2) After working for 8 shifts consecutively,
         // a person MUST have at least 12 hours/shifts NOT WORKING before they can be scheduled again.
+//        public static Boolean isConsistent(shiftDomains domains){
+//            for(ArrayList<Integer> domain: domains.shiftDomains){
+//                int consecutiveShifts = 0;
+//                int lastShiftHour = -1;
+//
+//                for (int i = 0; i < domain.size(); i++) {
+//                    int currentShiftHour = domain.get(i);
+//
+//                    // Check for consecutive shifts
+//                    if (currentShiftHour == lastShiftHour + 1) {
+//                        consecutiveShifts++;
+//                        System.out.println("consecutive shifts: "  +  consecutiveShifts);
+//                    } else {
+//                        consecutiveShifts = 1; // Reset consecutive shifts count
+//                    }
+//
+//                    // Check if consecutive shifts exceed the maximum allowed
+//                    if (consecutiveShifts > 8) {
+//                        return false; // Exceeded maximum consecutive hours constraint
+//                    }
+//
+//                    // Check for minimum break between shifts
+//                    if (i > 0) {
+//                        int breakDuration = currentShiftHour - lastShiftHour;
+//                        if (breakDuration < 12) {
+//                            return false; // Break duration constraint violated
+//                        }
+//                    }
+//
+//                    lastShiftHour = currentShiftHour;
+//                }
+//                return true;
+//            }
+//            return true; // All constraints satisfied
+//        }
         public static Boolean isConsistent(shiftDomains domains, ArrayList<Integer> assignedShifts){
             //Constraint 1: One person can't work more than 8 hours/shifts consecutively
             for(int i = 0; i < assignedShifts.size(); i++){
                 int person = assignedShifts.get(i);
+              //  System.out.println("Int i is " + i + ", Person is " + person);
                 int consecutiveHours = 1;
                 for(int j = i + 1; j < assignedShifts.size(); j++){
                     if(assignedShifts.get(j) == person){
-                       // System.out.println("assignedShifts.get(j) = " + assignedShifts.get(j) + " which == " + person);
+                       // System.out.println("int j is " + j);
+                        //System.out.println("assignedShifts.get(" + j + ") is " + assignedShifts.get(j) + " which == " + person);
                         consecutiveHours++;
                        // System.out.println("consecutive Hours: " + consecutiveHours);
                         if (consecutiveHours > 8){
                             return false;
                         }
                     } else{
-                        break;
+                        //break;
+                        consecutiveHours = 1;
                     }
                 }
             }
@@ -99,7 +146,7 @@ public class BacktrackSearch {
         public static Boolean forwardCheck(final int  hourToAssign, final int value, final shiftDomains domains){
             // Create a copy of the current domains to work with
             shiftDomains updatedDomains = new shiftDomains(domains);
-            System.out.println("Forward check call for hour: " + hourToAssign + ", value: " + value);
+           // System.out.println("Forward check call for hour: " + hourToAssign + ", value: " + value);
 
             // Assign the value to the hour in the updated domains
             updatedDomains.shiftDomains.get(hourToAssign).clear();
@@ -125,8 +172,8 @@ public class BacktrackSearch {
         }
 
         private static Boolean checkConstraints(int hour, shiftDomains updatedDomains){
-// Get the domain of the updated hour
-            List<Integer> currentHourDomain = updatedDomains.shiftDomains.get(hour);
+            // Get the domain of the updated hour
+            ArrayList<Integer> currentHourDomain = updatedDomains.shiftDomains.get(hour);
             int consecutiveShifts = 0;
             int lastShiftHour = -1;
 
