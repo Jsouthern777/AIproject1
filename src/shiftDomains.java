@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +21,7 @@ public class shiftDomains {
 
     //somehow check which employees are available for each hour of the shift...
     //would it make sense to have all employees at first and then make that consistent (change availabilities) after?
-    public shiftDomains(final int numShifts, final int numEmployees, final String availabilitesFilepath){
+    public shiftDomains(final int numShifts, final int numEmployees, final String availabilitesFilepath) throws IOException{
         shiftDomains = new ArrayList<ArrayList<Integer>>();
         
 		for (int varIndex=0; varIndex<numShifts; varIndex++) {
@@ -26,10 +29,11 @@ public class shiftDomains {
 			shiftDomains.add(new ArrayList<Integer>());
 		}
 
-		Scanner scn = new Scanner(availabilitesFilepath);
+        String filepathString = Files.readString(Path.of(availabilitesFilepath));
+		Scanner scn = new Scanner(filepathString);
 		while (scn.hasNextInt()) {
-			final int var1 = scn.nextInt(); //employee number
-			final int var2 = scn.nextInt(); //shift number
+			int var1 = scn.nextInt(); //employee number
+			int var2 = scn.nextInt(); //shift number
 
 			if (var1 < 0 || var1 >= numEmployees) {
 				throw new IllegalArgumentException(
@@ -40,10 +44,10 @@ public class shiftDomains {
 						"Invalid shift domain input file: Shift " + var2 + " is out of bounds [0," + (numShifts-1) + "]");
 			}
 
-            //Add the employee to the shifts that they are available for
+            //Add the employee number to the shifts that they are available for
 			shiftDomains.get(var2).add(var1);
 		}//end while
-        
+
 		if (scn.hasNext()) {
 			throw new IllegalArgumentException("Invalid shift domain input file: non-numeric value: " + scn.next());
 		}
