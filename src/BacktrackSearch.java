@@ -3,8 +3,6 @@ import java.util.ArrayList;
 //Only pseudocode used was that from our own textbook
 //This class will do the backtracking with FC and MRV search
 public class BacktrackSearch {
-    ArrayList<Integer> assignedShifts = new ArrayList<>();
-
         public static shiftDomains backtrackMRV(final SchedulingProblem  problem, final shiftDomains domains, final ArrayList<Integer> assignedShifts){
             boolean solution = true;
 
@@ -20,13 +18,15 @@ public class BacktrackSearch {
                 return domains;
             }
 
-            int hourToAssign = assignNextHour(problem, domains);
+            int hourToAssign = assignNextHour(domains);
             for(int value: domains.shiftDomains.get(hourToAssign)){
                 assignedShifts.set(hourToAssign, value);
                 if(isConsistent(domains, assignedShifts)){
                     shiftDomains newDomains = new shiftDomains(domains);
                     newDomains.shiftDomains.get(hourToAssign).clear();
                     newDomains.shiftDomains.get(hourToAssign).add(value);
+                    //Do forward checking here?
+                    //ForwardCheck(var/hour, int value, prob)
                     shiftDomains result = backtrackMRV(problem, newDomains, assignedShifts);
                     if(result != null){
                         return result;
@@ -58,23 +58,33 @@ public class BacktrackSearch {
 
                 }
             }
-        //Constraint 2: Minimum 12-hour break between consecutive shifts for each person
-            for(int i = 1; i < assignedShifts.size(); i++){
-                int currentHour = assignedShifts.get(i);
-                int previousHour = assignedShifts.get(i-1);
-                if(currentHour - previousHour <= 12 && i >= 8){
-                    return false;
+            //constraint 2
+            for(int person: assignedShifts){
+                int consecutiveShifts = 0;
+                for(int i = 1; i < assignedShifts.size(); i++){
+                    if(assignedShifts.get(i) == person && assignedShifts.get(i) != assignedShifts.get(i-1)){
+
+                    }
                 }
             }
+        //Constraint 2: Minimum 12-hour break between consecutive shifts for each person
+//            for(int i = 1; i < assignedShifts.size(); i++){
+//                int currentHour = assignedShifts.get(i);
+//                int previousHour = assignedShifts.get(i-1);
+//                if(currentHour - previousHour <= 12 && i >= 8){
+//                    return false;
+//                }
+//            }
             return true;
         }
-
+//want to make sure that assigning a particular hour doesn't leave another hour with nothing in its domain
         public static Boolean forwardCheck(final SchedulingProblem prob, final shiftDomains domains){
+
             return false;
         }
 
         //basically the MRV portion!
-        public static int assignNextHour(final SchedulingProblem prob, final shiftDomains domains){
+        public static int assignNextHour(final shiftDomains domains){
             //TODO: use MRV to get the next variable
             int maxValue = -1;
             int maxHourVal =  -1;
@@ -93,7 +103,7 @@ public class BacktrackSearch {
                     maxValue = remainingValues;
                     maxHourVal = hour; // Update the hour of the variable with the most remaining values
                 }
-                // If the current hour has the same number of remaining values as the previous maximum, apply tie-breaking logic
+                // If the current hour has the same number of remaining values as the previous maximum, apply most-constraints tie-breaker
                 else if (remainingValues == maxValue) {
                     // Check which hour is involved in the most constraints
                     ArrayList<Integer> hourWithMostConstraints = mostConstraints(domains.shiftDomains.get(maxHourVal), currentHourDomain);

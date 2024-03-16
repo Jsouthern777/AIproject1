@@ -14,11 +14,14 @@ public class Solver {
         //Initialize the domains from the input file
         shiftDomains startDomains = new shiftDomains(numShifts, numEmployees, availabilitiesFilename);
 
-        System.out.println(startDomains.toString()); //for testing
+        System.out.println(startDomains); //for testing
 
 
         //Begin instance of Jackson's backtracking MRV search
         ArrayList<Integer> assignedShifts = new ArrayList<>();
+        for(int i = 1; i <= numShifts; i++){
+            assignedShifts.add(-1);
+        }
         shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains,assignedShifts);
 
         //checks the success of the backtracking MRV solver and prints the result
