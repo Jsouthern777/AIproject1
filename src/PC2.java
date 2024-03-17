@@ -21,6 +21,9 @@ public class PC2 {
     //employee number. 
     public static shiftDomains backtrackPC2(final SchedulingProblem  problem, final shiftDomains domains, final int nextHourToAssign, final NodeCounter counter, final int verbosity){
         counter.incrementPC2Count();
+        if (verbosity >= 1){
+            System.out.println("A recursive call was just made, here are the current domains:\n" + domains);
+        }
 
         //if assignment is complete then return the assignments
         if (nextHourToAssign == problem.getNumShifts()){
@@ -47,10 +50,6 @@ public class PC2 {
 
                 //Loop through the neighbors of the current hour being assigned
                 for(int neighborIndex = 0; neighborIndex < currentHourNeighbors.size(); neighborIndex++){
-
-                    //path consistency for this algorithm means checking them against each other and forward checking the neighbors' neighbors with both assignments
-                    //only makes a path (triangle) if it is in both neighbors lists. 
-                    //Make an is consistent method that takes in two assignment
                
                     //Loop through the other hour being checked's domain
                     for(int otherShiftDomainIndex = 0; otherShiftDomainIndex < tempDomains.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).size(); otherShiftDomainIndex++){
@@ -66,43 +65,43 @@ public class PC2 {
 
                         //Check the path consistency of the current 2 variable temporary assignment
                         if(!isConsistent(problem, assignmentToCheck, currentShift, currentHourNeighbors.get(neighborIndex))){
+
+                            if(verbosity == 2){
+                                System.out.print("Just checked current Shift:" + currentShift + " current employee:" + assignmentToCheck.shiftDomains.get(currentShift).get(0));
+                                System.out.println(" and other Shift:" + currentHourNeighbors.get(neighborIndex) + " other employee:" + assignmentToCheck.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).get(0));
+                                System.out.println("It was inconsistent. Now trying the next pair of potential assignments");
+                            }
                             
                             //domain is inconsistent so remove it 
                             tempDomains.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).remove(otherShiftDomainIndex);
 
                             //If any neighbor runs out of possible employees, this assignment
                             if(tempDomains.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).size() <= 0){
+                                if(verbosity == 2){
+                                    System.out.println("Shift " + currentHourNeighbors.get(neighborIndex) + "'s domain is empty, returning null");
+                                }
                                 return null;
                             }
                             otherShiftDomainIndex--; //account for variable removal
+                        }
+                        else{
+                            if(verbosity == 2){
+                                System.out.print("Just checked current Shift:" + currentShift + " current employee:" + assignmentToCheck.shiftDomains.get(currentShift).get(0));
+                                System.out.println(" and other Shift:" + currentHourNeighbors.get(neighborIndex) + " other employee:" + assignmentToCheck.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).get(0));
+                                System.out.println("It was consistent");
+                            }
                         }
                        
                     }//end otherShiftDomainIndex for
 
                 }//end neighborIndex for
 
-            
-            /*
-            //If this is the second to last shift, both assignments will work
-            if(currentShift == problem.getNumShifts() - 2){
-                return assignmentToCheck;
-            }
-            */
-
-
-            // If the code gets to this point, the tempory assignment has passed PC2 checks and is ready to be actually assigned
-
-            //Assign the current variable that just passed the PC2 checks
-            /*
-            shiftDomains recursiveDomains = new shiftDomains(domainCopy);
-            ArrayList<Integer> realVariableAssignment = new ArrayList<>();
-            realVariableAssignment.add(tempDomains.shiftDomains.get(currentShift).get(currentShiftDomainIndex));
-            recursiveDomains.shiftDomains.set(currentShift, realVariableAssignment);
-            */
 
             //Recursive call
-            //System.out.println("Making recursive call. CurrShift: " + currentShift + "\n");// + "\nDomain assignments:"+ recursiveDomains);
-            shiftDomains result = backtrackPC2(problem, new shiftDomains(tempDomains), currentShift + 1, counter);
+            if(verbosity == 2){
+            System.out.println("\nNow assigning employee #" + domainCopy.shiftDomains.get(currentShift).get(currentShiftDomainIndex) + " to shift #" + currentShift + " and making a recursive call");
+            }
+            shiftDomains result = backtrackPC2(problem, new shiftDomains(tempDomains), currentShift + 1, counter, verbosity);
             if (result != null){
                 return result;
             }
@@ -219,7 +218,5 @@ private static boolean isConsistent(SchedulingProblem problem, shiftDomains doma
     //If it makes it to this point, it has survived the consistency checks
     return true;
 }//end isConsistent
-
-
 
 }//end PC2
