@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+
 public class BacktrackSearch {
 
     public static shiftDomains backtrackMRV(SchedulingProblem problem, shiftDomains domains) {

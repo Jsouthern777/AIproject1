@@ -53,6 +53,12 @@ public class shiftDomains {
 		}
 		scn.close();
 
+        for(int i = 0; i < numShifts; i++){
+            if(shiftDomains.get(i).size() == 0){
+                throw new IllegalArgumentException("Invalid shift domain input file: some shifts have no available employees");
+            }
+        }
+
         /* REMOVED SAFETY FACTOR
 		// Make the connections lists unmodifiable
 		// This allows us to safely return iterators to those collections, since we know the
