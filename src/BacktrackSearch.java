@@ -68,7 +68,7 @@ public class BacktrackSearch {
             return hour2;
         }
     }
-
+//
     // Helper method to count the number of constraints for a set of domain values
     private static int countConstraints(shiftDomains domains, int hour) {
         ArrayList<Integer> domain = domains.shiftDomains.get(hour);
