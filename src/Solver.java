@@ -2,8 +2,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-//TODO: implement performance eval and verbosity parameter
 
+
+//This class was co-written by Andrew and Jackson
 public class Solver {
 //same problem will be solved multiple times by both algorithms, so generate availabilities,
 // numEmployees, numShifts, and startTime here

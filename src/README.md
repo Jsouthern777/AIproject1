@@ -28,3 +28,11 @@ included in the test case. The left column is the employee number
 and the right column corresponds to a shift that that employee is 
 available to work. A few test cases are included in the zip file, 
 but more can be easily generated and tested using testBuilder.java.
+
+Notes on interpretation:
+When a set of domains prints out, the left column labeled 'Hour'
+corresponds to the shift being assigned, and the 'Available Employees'
+column is a list of any employess that are available to work that shift.
+As the code progresses domains will shrink to zero. When the code finishes
+the domains will contain only one employee and that is the employee 
+assigned to work the corresponding shift

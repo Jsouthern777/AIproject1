@@ -15,6 +15,15 @@ import java.util.Queue;
  * I used the general structure of this algorithm but modified it to fit this problem. I check all paris of X1 and X2 and removed
  * the nodes that were inconsistent with both assignments and if no consistent assignments are remaining, then it returns null 
  * 
+ * The main backtrackPC2 function iterates through the possible domain assignments for the current shift being assigned.
+ * For each potential assignment of the current shift, it loads a queue 'pairsToCheck' with all of the possible domains in 
+ * each neighbor that follows the current shift. The entries in the queue are checked for path consistency using PC2 and if there
+ * is still at least 1 employee remaining in each neighbor's domain then the current shift is clear to be actually assigned.
+ * Then a recursive call is made to try the next hour. If all possible domain assignments for the current shift yield no possible
+ * solution then it returns null.
+ * 
+ * This is very slow and generates a lot of nodes. Adding in forward checking would improve the number of backtracks made significantly.
+ * If a future shift's domain only has one employee available, it keeps going until it hits that error.
  */
 
 public class PC2 {
@@ -32,10 +41,16 @@ public class PC2 {
         if (nextHourToAssign == problem.getNumShifts()){
             return domains;
         }
+
         int currentShift = nextHourToAssign;
         shiftDomains domainCopy = new shiftDomains(domains);
+
+        //Because all variables are being assigned in sequential order, anything previous is already assigned
+        //so we only need to check the potential current shift assignment's consistency with the neighboring 
+        //shifts that come after it. It gets up to "minHoursBetweenShifts" neighbors 
         ArrayList<Integer> currentHourNeighbors = getForwardNeighbors(problem, currentShift);
 
+        //This is the queue that stores the pairs of variables to check
         Queue<Integer> pairsToCheck;
 
 
@@ -43,6 +58,7 @@ public class PC2 {
         //The next inner layer iterates through the neighbors that need to be checked, and the inner-most loop
         //iterates through the domains of that other neighbor to be checked
 
+        //This loops through to load the constrained pairs 
                 
         //Loop through and check all of the children of the current hour being assigned 
             for(int currentShiftDomainIndex = 0; currentShiftDomainIndex < domainCopy.shiftDomains.get(currentShift).size(); currentShiftDomainIndex++){
@@ -185,8 +201,6 @@ public class PC2 {
 
     return neighbors;
 }//end getForwardNeighbors
-
-
 
 
 //This method checks to see if the potential assignment pair is consistent with everything else

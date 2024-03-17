@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * @Author Andrew and Jackson
  * What we need:
  * Variables: Hours/Shifts
  * Values: People

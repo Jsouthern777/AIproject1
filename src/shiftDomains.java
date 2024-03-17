@@ -11,6 +11,7 @@ public class shiftDomains {
     //shiftDomains.get(i) contains the possible values (people) for variable i (hour i)
     public ArrayList<ArrayList<Integer>> shiftDomains;
 
+    //Written by Jackson
     //deep copy constructor
     public shiftDomains(final shiftDomains otherDomains) {
         shiftDomains = new ArrayList<ArrayList<Integer>>();
@@ -19,8 +20,7 @@ public class shiftDomains {
         }
     }
 
-    //somehow check which employees are available for each hour of the shift...
-    //would it make sense to have all employees at first and then make that consistent (change availabilities) after?
+    //written by Andrew
     public shiftDomains(final int numShifts, final int numEmployees, final String availabilitesFilepath) throws IOException{
         shiftDomains = new ArrayList<ArrayList<Integer>>();
         
@@ -59,18 +59,9 @@ public class shiftDomains {
             }
         }
 
-        /* REMOVED SAFETY FACTOR
-		// Make the connections lists unmodifiable
-		// This allows us to safely return iterators to those collections, since we know the
-		// iterator cannot be used to change our private data!
-		for (int varIndex=0; varIndex<numShifts; varIndex++) {
-			shiftDomains.set(varIndex, Collections.unmodifiableList(shiftDomains.get(varIndex)));
-		}
-        */
-
-
     }
 
+    //Written by Jackson
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder("Hour\tAvailable Employees\n");
