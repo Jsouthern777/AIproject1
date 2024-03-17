@@ -1,34 +1,48 @@
 import com.sun.source.doctree.SeeTree;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
+/*  Author: Jackson  Southern
+Implements  backtracking search with forward checking and  an MRV heuristic.
+
+ */
 public class BacktrackSearch {
 
     public static shiftDomains backtrackMRV(SchedulingProblem problem, shiftDomains domains, final NodeCounter counter, int verbosity) {
 
+        //If all domains have one value, solution is found
         if (isComplete(domains)) {
             return domains;
         }
+        //prints domains for each call if verbosity is 1
         if(verbosity == 1){
             System.out.println("For iteration " + counter.getMRVCount() + ":\n" + domains);
         }
+        //uses MRV heuristic to select the next variable/hour
         int var = selectUnassignedVariable(domains, problem);
+
+        //creates a list of values for that variable
         ArrayList<Integer> orderedValues = domains.shiftDomains.get(var);
+
+        //loops through each value in that variable
         for (int value : orderedValues) {
+            //consistency check
             if (isConsistent(problem, domains, var, value)) {
+                //deep copy of the domains
                 shiftDomains newDomains = new shiftDomains(domains);
                 newDomains.shiftDomains.get(var).clear(); //clears the hour selected
                 newDomains.shiftDomains.get(var).add(value); //adds the value to the previously cleared hour
+
+                //prints every time a variable is assigned if verbosity is 2
                 if(verbosity == 2){
                     System.out.println("Assigning variable " + value + " to " + var);
                 }
 
                 //forward checking
                 if(forwardCheck(problem, newDomains, var, value)){
+                    //counter for testing purposes
                     counter.MRVNodeCount();
+                    //backtracking
                     shiftDomains result = backtrackMRV(problem, newDomains, counter, verbosity);
                     if (result != null) {
                         return result;
@@ -86,12 +100,15 @@ public class BacktrackSearch {
         int minRemainingValues = Integer.MAX_VALUE;
         int selectedVariable = -1;
         int maxConstraints = -1;
+
+        //Checks sizes of all variables, selects one with the least remaining values
         for (int i = 0; i < domains.shiftDomains.size(); i++) {
             ArrayList<Integer> domain = domains.shiftDomains.get(i);
             if (domain.size() > 1 && domain.size() < minRemainingValues) {
                 minRemainingValues = domain.size();
                 selectedVariable = i;
             }
+            //If there's a tie, it selects the hour involved in the most constraints
             else if(domain.size() == minRemainingValues){
                 int numConstraints = countConstraints(problem, i, domains);
                 if(numConstraints > maxConstraints){
@@ -103,6 +120,7 @@ public class BacktrackSearch {
         return selectedVariable;
     }
 
+    //tie-breaking heuristic for MRV
     private static int countConstraints(SchedulingProblem problem, int var, shiftDomains domains){
         int constraintCount = 0;
         ArrayList<Integer> domain = domains.shiftDomains.get(var);
@@ -140,7 +158,7 @@ public class BacktrackSearch {
         return constraintCount;
     }
 
-
+//Consistency check
     private static boolean isConsistent(SchedulingProblem problem, shiftDomains domains, int var, int value) {
         // Check if assigning the value to the variable violates any constraints
         ArrayList<Integer> domain = domains.shiftDomains.get(var);
