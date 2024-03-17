@@ -10,6 +10,11 @@ import java.util.List;
 public class SchedulingProblem {
 
     private int numShifts;
+
+    public int getNumEmployees() {
+        return numEmployees;
+    }
+
     private int numEmployees;
     private ArrayList<List<Integer>> shiftAssignments;
     private int minBetweenShifts;

@@ -20,10 +20,10 @@ public class Solver {
         //Begin instance of Jackson's backtracking MRV search
         ArrayList<Integer> assignedShifts = new ArrayList<>();
         //initialize assignedShifts to allow setting each hour
-        for(int i = 0; i <= numShifts; i++){
-            assignedShifts.add(i);
+        for(int i = 0; i < numShifts; i++){
+            assignedShifts.add(-1);
         }
-        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains,assignedShifts);
+        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains);
 
         //checks the success of the backtracking MRV solver and prints the result
         if(result1 != null){
@@ -41,7 +41,7 @@ public class Solver {
 
         //checks the success of the backtracking PC2 solver and prints the result
         if(result2 != null){ 
-            System.out.println(result2);
+           // System.out.println(result2);
         }
         else{
             System.out.println("No solution found for PC2");
@@ -55,7 +55,7 @@ public class Solver {
 
 
     public static void main(String[] args) throws IOException{
-       // runInstance(10,5, "5E 10S.txt");
+        runInstance(10,5, "5E 10S.txt");
         runInstance(25, 10, "10E 25S.txt");
     }
 

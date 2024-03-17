@@ -1,267 +1,65 @@
-import java.lang.reflect.Array;
+import com.sun.source.doctree.SeeTree;
+
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-//Only pseudocode used was that from our own textbook
-//This class will do the backtracking with FC and MRV search
 public class BacktrackSearch {
-        public static shiftDomains backtrackMRV(final SchedulingProblem  problem, final shiftDomains domains, final ArrayList<Integer> assignedShifts){
-            boolean solution = true;
 
-            //Check if  size of all domains is one
-            for(ArrayList<Integer> domain: domains.shiftDomains){
-                if(domain.size() != 1){
-                    solution = false;
-                    break;
-                }
-            }
-            //A solution has thus been theoretically found
-            if(solution) {
-                return domains;
-            }
+    public static shiftDomains backtrackMRV(SchedulingProblem problem, shiftDomains domains) {
 
-            int hourToAssign = assignNextHour(domains, assignedShifts);
-           // System.out.println("hour to assign: " + hourToAssign);
-            System.out.println(domains);
-            for(int value: domains.shiftDomains.get(hourToAssign)){
-                System.out.println("Hour to Assign: " + hourToAssign + " value: " + value);
-                assignedShifts.set(hourToAssign, value);
-                printShifts(assignedShifts);
-               // System.out.println("assignedShifts size: " + assignedShifts.size());
-                if(isConsistent(domains, assignedShifts)){
-                    //System.out.println("consistency found!");
-                    //System.out.println("consistency found");
-                    shiftDomains newDomains = new shiftDomains(domains);
-                    newDomains.shiftDomains.get(hourToAssign).clear();
-                    newDomains.shiftDomains.get(hourToAssign).add(value);
-                    //System.out.println("Line 33" + newDomains.shiftDomains.get(hourToAssign));
-                    //Do forward checking here?
-                    if(forwardCheck(hourToAssign, value, newDomains)){
-                        shiftDomains result = backtrackMRV(problem, newDomains, assignedShifts);
-                        if(result != null){
-                            return result;
-                        }
-                    }
-                    //newDomains.shiftDomains.set(hourToAssign, new ArrayList<>(domains.shiftDomains.get((hourToAssign))));
-                }
-               // System.out.println("assignedShift size -1: " + (assignedShifts.size()-1));
-               // System.out.println("removing shift: " + assignedShifts.get(assignedShifts.size()-1));
-
-                //domain restoration
-                assignedShifts.remove(hourToAssign);
-            }
-            //backtracking
-            return null;
+        if (isComplete(domains)) {
+            return domains;
         }
 
-        public static void printShifts(ArrayList<Integer> assignedShifts){
-            System.out.println("Printing  assigned shifts: ");
-            for(int i = 0; i < assignedShifts.size(); i++){
-                System.out.println(assignedShifts.get(i));
+        int var = selectUnassignedVariable(domains);
+        ArrayList<Integer> orderedValues = orderDomainValues(domains, var);
+        for (int value : orderedValues) {
+            if (isConsistent(problem, domains, var, value)) {
+                shiftDomains newDomains = new shiftDomains(domains);
+                newDomains.shiftDomains.get(var).clear(); //clears the hour selected
+                newDomains.shiftDomains.get(var).add(value); //adds the value to the previously cleared hour
+                    shiftDomains result = backtrackMRV(problem, newDomains);
+                    if (result != null) {
+                        return result;
+                    }
+
             }
         }
 
-        //Constraints:
-        // 1) No more than 8 hours consecutively for one person
-        // 2) After working for 8 shifts consecutively,
-        // a person MUST have at least 12 hours/shifts NOT WORKING before they can be scheduled again.
-//        public static Boolean isConsistent(shiftDomains domains){
-//            for(ArrayList<Integer> domain: domains.shiftDomains){
-//                int consecutiveShifts = 0;
-//                int lastShiftHour = -1;
-//
-//                for (int i = 0; i < domain.size(); i++) {
-//                    int currentShiftHour = domain.get(i);
-//
-//                    // Check for consecutive shifts
-//                    if (currentShiftHour == lastShiftHour + 1) {
-//                        consecutiveShifts++;
-//                        System.out.println("consecutive shifts: "  +  consecutiveShifts);
-//                    } else {
-//                        consecutiveShifts = 1; // Reset consecutive shifts count
-//                    }
-//
-//                    // Check if consecutive shifts exceed the maximum allowed
-//                    if (consecutiveShifts > 8) {
-//                        return false; // Exceeded maximum consecutive hours constraint
-//                    }
-//
-//                    // Check for minimum break between shifts
-//                    if (i > 0) {
-//                        int breakDuration = currentShiftHour - lastShiftHour;
-//                        if (breakDuration < 12) {
-//                            return false; // Break duration constraint violated
-//                        }
-//                    }
-//
-//                    lastShiftHour = currentShiftHour;
-//                }
-//                return true;
-//            }
-//            return true; // All constraints satisfied
-//        }
-        public static Boolean isConsistent(shiftDomains domains, ArrayList<Integer> assignedShifts){
-            //Constraint 1: One person can't work more than 8 hours/shifts consecutively
-            for(int i = 0; i < assignedShifts.size(); i++){
-                int person = assignedShifts.get(i);
-              //  System.out.println("Int i is " + i + ", Person is " + person);
-                int consecutiveHours = 1;
-                for(int j = i + 1; j < assignedShifts.size(); j++){
-                    if(assignedShifts.get(j) == person){
-                       // System.out.println("int j is " + j);
-                        //System.out.println("assignedShifts.get(" + j + ") is " + assignedShifts.get(j) + " which == " + person);
-                        consecutiveHours++;
-                       // System.out.println("consecutive Hours: " + consecutiveHours);
-                        if (consecutiveHours > 8){
-                            return false;
-                        }
-                    } else{
-                        //break;
-                        consecutiveHours = 1;
-                    }
-                }
+        return null; // No solution found
+    }
+
+    private static boolean isComplete(shiftDomains domains) {
+        // Check if all variables are assigned
+        for (ArrayList<Integer> domain : domains.shiftDomains) {
+            if (domain.size() != 1) {
+                return false;
             }
-            //constraint 2
-            for (int i = 0; i < assignedShifts.size() - 8; i++) {
-                int person = assignedShifts.get(i);
-                int consecutiveHours = 0;
-                for (int j = i; j < i + 8; j++) {
-                    if (assignedShifts.get(j) == person) {
-                        consecutiveHours++;
-                    }
-                }
-                if (consecutiveHours == 8) {
-                    int breakStartHour = i + 8;
-                    int breakEndHour = breakStartHour + 12;
-                    for (int k = breakStartHour; k < breakEndHour; k++) {
-                        if (assignedShifts.get(k) == person) {
-                            return false; // Less than 12 hours break after 8 consecutive shifts
-                        }
-                    }
-                }
-            }
-            return true;
         }
-//want to make sure that assigning a particular hour doesn't leave another hour with nothing in its domain
-        public static Boolean forwardCheck(final int  hourToAssign, final int value, final shiftDomains domains){
-            // Create a copy of the current domains to work with
-            shiftDomains updatedDomains = new shiftDomains(domains);
-           // System.out.println("Forward check call for hour: " + hourToAssign + ", value: " + value);
+        return true;
+    }
 
-            // Assign the value to the hour in the updated domains
-            updatedDomains.shiftDomains.get(hourToAssign).clear();
-            updatedDomains.shiftDomains.get(hourToAssign).add(value);
-
-            // Remove the assigned value from other hours' domains based on constraints
-            for (int h = 0; h < updatedDomains.shiftDomains.size(); h++) {
-                if (h != hourToAssign) {
-                    ArrayList<Integer> currentDomain = updatedDomains.shiftDomains.get(h);
-                    // Check if the assigned value violates any constraints for this hour
-                    // For example, if the assigned value is not consistent with the constraints of the problem
-                    // you would remove it from the domain of this hour
-                    if (!checkConstraints(h, updatedDomains)) {
-                        currentDomain.remove(Integer.valueOf(value));
-                        // Check if removing the value leads to an empty domain
-                        if (currentDomain.isEmpty()) {
-                            return false; // Empty domain found, inconsistency detected
-                        }
-                    }
-                }
+    private static int selectUnassignedVariable(shiftDomains domains) {
+        // Select the variable with the fewest remaining values
+        int minRemainingValues = Integer.MAX_VALUE;
+        int selectedVariable = -1;
+        for (int i = 0; i < domains.shiftDomains.size(); i++) {
+            ArrayList<Integer> domain = domains.shiftDomains.get(i);
+            if (domain.size() > 1 && domain.size() < minRemainingValues) {
+                minRemainingValues = domain.size();
+                selectedVariable = i;
             }
-            return true; // No empty domains found, consistent assignment
-        }
-
-        private static Boolean checkConstraints(int hour, shiftDomains updatedDomains){
-            // Get the domain of the updated hour
-            ArrayList<Integer> currentHourDomain = updatedDomains.shiftDomains.get(hour);
-            int consecutiveShifts = 0;
-            int lastShiftHour = -1;
-
-            for (int i = 0; i < currentHourDomain.size(); i++) {
-                int currentShiftHour = currentHourDomain.get(i);
-
-                // Check for consecutive shifts
-                if (currentShiftHour == lastShiftHour + 1) {
-                    consecutiveShifts++;
-                } else {
-                    consecutiveShifts = 1; // Reset consecutive shifts count
-                }
-
-                // Check if consecutive shifts exceed the maximum allowed
-                if (consecutiveShifts > 8) {
-                    return false; // Exceeded maximum consecutive hours constraint
-                }
-
-                // Check for minimum break between shifts
-                if (i > 0) {
-                    int breakDuration = currentShiftHour - lastShiftHour;
-                    if (breakDuration < 12) {
-                        return false; // Break duration constraint violated
-                    }
-                }
-
-                lastShiftHour = currentShiftHour;
+            else if(domain.size() > 1 && domain.size() == minRemainingValues){
+                selectedVariable = mostConstraints(domains, selectedVariable, i);
             }
-            return true; // All constraints satisfied
         }
-
-
-        public static int assignNextHour(final shiftDomains domains, final ArrayList<Integer> assignedShifts){
-            //need to have statement such that if an hour already has one element in its domain, do NOT check
-            //TODO: use MRV to get the next variable
-            int minValue = Integer.MAX_VALUE;
-            int minHourVal = Integer.MAX_VALUE;
-
-
-            // Loop through each hour (variable) in the domain
-            for(int hour = 0; hour < domains.shiftDomains.size(); hour++){
-                //System.out.println("For loop hour: " + hour);
-                // Get the domain of values for the current hour
-                ArrayList<Integer> currentHourDomain = domains.shiftDomains.get(hour);
-                //System.out.println("Domain for hour iteration " + hour);
-                //System.out.println(currentHourDomain.toString());
-
-                // Calculate the number of remaining values for the current hour
-                int remainingValues = currentHourDomain.size();
-
-                if(remainingValues == 1){
-                    continue;
-                }
-
-                //  System.out.println("Remaining values for this hour: " + remainingValues);
-
-                // If the current hour has more remaining values than the previous maximum, update the maximum
-                if(remainingValues < minValue){
-                    // System.out.println("At hour " + hour + ", remaining values " + remainingValues + " is less than maxValue " + minValue);
-                    minValue = remainingValues;
-                    minHourVal = hour; // Update the hour of the variable with the most remaining values
-                }
-               //  If the current hour has the same number of remaining values as the previous maximum, apply most-constraints tie-breaker
-
-                else if (remainingValues == minValue) {
-                  //  System.out.println("Before else if remvalues == minvalues: " + minValue);
-                    // Check which hour is involved in the most constraints
-                    // System.out.println("At hour " + hour + ", remaining values " + remainingValues + " is equal to maxValue " + minValue);
-                    ArrayList<Integer> hourWithMostConstraints = mostConstraints(domains.shiftDomains.get(minHourVal), currentHourDomain, assignedShifts);
-                    //System.out.println("Hour with most constraints is " + hour + " " + hourWithMostConstraints);
-                    // Update the maximum hour based on the tie-breaking logic
-
-                    if (hourWithMostConstraints == currentHourDomain) {
-                        // System.out.println("maxHourVal " + minHourVal + "is the hour: " + hour);
-                        minHourVal = hour;
-                       // System.out.println("Thus, minHourVal is " + hour);
-                    }
-                    else{
-                       // System.out.println("min hour val remains " + minHourVal);
-                    }
-                }
-            }
-            return minHourVal;
-        }
-    public static ArrayList<Integer> mostConstraints(final ArrayList<Integer> hour1, final ArrayList<Integer> hour2, final ArrayList<Integer> assignedShifts){
-            //TODO: See which of the two variables is involved in the most constraints
-        int constraintsInDomain1 = countConstraints(hour1);
-        int constraintsInDomain2 = countConstraints(hour2);
+        return selectedVariable;
+    }
+    public static int mostConstraints(shiftDomains domains, int hour1, int hour2){
+        //TODO: See which of the two variables is involved in the most constraints
+        int constraintsInDomain1 = countConstraints(domains, hour1);
+        int constraintsInDomain2 = countConstraints(domains, hour2);
 
         // Compare the number of constraints in each domain
         if (constraintsInDomain1 >= constraintsInDomain2) {
@@ -272,14 +70,15 @@ public class BacktrackSearch {
     }
 
     // Helper method to count the number of constraints for a set of domain values
-    private static int countConstraints(ArrayList<Integer> domain) {
+    private static int countConstraints(shiftDomains domains, int hour) {
+        ArrayList<Integer> domain = domains.shiftDomains.get(hour);
         int consecutiveHours = 0;
         boolean reachedEightConsecutiveHours = false;
         int hoursWithoutBreak = 0;
         int constraints = 0;
 
-        for (int i = 0; i < domain.size(); i++) {
-            int currentShift = domain.get(i);
+        for (int i = 0; i < domains.shiftDomains.size(); i++) {
+            int currentShift = domains.shiftDomains.get(i);
 
             // Increment consecutive hours counter
             consecutiveHours++;
@@ -311,6 +110,53 @@ public class BacktrackSearch {
         return constraints;
     }
 
+    private static ArrayList<Integer> orderDomainValues(shiftDomains domains, int var) {
+        // Order values according to some heuristic (e.g., least-constraining value)
+        return domains.shiftDomains.get(var);
+    }
+
+    private static boolean isConsistent(SchedulingProblem problem, shiftDomains domains, int var, int value) {
+        // Check if assigning the value to the variable violates any constraints
+        ArrayList<Integer> domain = domains.shiftDomains.get(var);
+        if (!domain.contains(value)) {
+            return false; // Value not in domain
+        }
+
+        // Check constraint: No more than 8 consecutive shifts
+        int consecutiveShifts = 0;
+        for (int i = var; i < domains.shiftDomains.size(); i++) {
+            if (domains.shiftDomains.get(i).contains(value)) {
+                consecutiveShifts++;
+                if (consecutiveShifts > problem.getMaxConsecutiveHours()) {
+                    return false;
+                }
+            } else {
+                break;
+            }
+        }
+
+        // Check constraint: At least 12 hours between consecutive shifts for the same person
+        if (var > 0) {
+            // Find the last time the person was assigned
+            int lastAssignedIndex = -1;
+            for (int i = var - 1; i >= 0; i--) {
+                if (domains.shiftDomains.get(i).contains(value)) {
+                    lastAssignedIndex = i;
+                    break;
+                }
+            }
+
+            // If the person was assigned within the last 8 shifts, check for the break duration
+            if (lastAssignedIndex != -1 && var - lastAssignedIndex <= problem.getMaxConsecutiveHours()) {
+                int breakDuration = var - lastAssignedIndex - 1; // Calculate the break duration
+                if (breakDuration < problem.getMinBetweenShifts()) {
+                    return false; // Break duration is less than the required minimum
+                }
+            }
+        }
+
+        return true;
+    }
 
 
 }
