@@ -22,7 +22,7 @@ public class Solver {
 
 
         System.out.println("\n\nHere are the domains at the start of the problem " + availabilitiesFilename);
-        System.out.println("with maximum consecutive shifts of " + prob.getMaxConsecutiveHours() + "hours and at least " + prob.getMinBetweenShifts() + " hours between shifts");
+        System.out.println("with maximum consecutive shifts of " + prob.getMaxConsecutiveHours() + " hours and at least " + prob.getMinBetweenShifts() + " hours between shifts");
         System.out.println(startDomains); //for testing
 
         
@@ -91,7 +91,7 @@ public class Solver {
 
 
         System.out.println("\n\nHere are the domains at the beginning of the test " + availabilitiesFilename);
-        System.out.println("with maximum consecutive shifts of " + maxConsecutiveHours + "hours and at least " + minHoursBetweenShifts + " hours between shifts");
+        System.out.println("with maximum consecutive shifts of " + maxConsecutiveHours + " hours and at least " + minHoursBetweenShifts + " hours between shifts");
         System.out.println(startDomains); //for testing
 
        long startTime = System.nanoTime();
@@ -137,15 +137,14 @@ public class Solver {
 
 
 
-
     public static void main(String[] args) throws IOException{
-        //runInstance(10,5, "5E 10S.txt",  1);
-        //runInstance(25, 10, "10E 25S.txt",0);
-        //runInstance(25, 10, "10E 25S.txt", 6, 3,0);
-        //runInstance(25, 10, "10E 25S.txt", 12, 2,0);  //should fail
-        runInstance(50, 15, "15E 50S.txt",1);
-        //runInstance(100, 30, "30E 100S.txt");
-        //runInstance(200, 30, "30E 200S.txt");
+        runInstance(10,5, "5E 10S.txt",  0);
+        runInstance(25, 10, "10E 25S.txt",0);
+        runInstance(25, 10, "10E 25S.txt", 6, 3,0);
+        runInstance(25, 10, "10E 25S.txt", 12, 2,0);  //should fail
+        runInstance(50, 15, "15E 50S.txt",0);
+        //runInstance(100, 30, "30E 100S.txt"); //will run but PC2 is very slow
+        //runInstance(200, 30, "30E 200S.txt"); //will run but PC2 is very slow
     }
 
 
