@@ -49,38 +49,32 @@ public class PC2 {
                         variableAssignment.add(domainCopy.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).get(otherShiftDomainIndex));
                         assignmentToCheck.shiftDomains.set(currentHourNeighbors.get(neighborIndex),variableAssignment);
 
-
+/*
                         //Check consistency of the potential current shift assignment and the potential second shift assignment     
-                        //consistentAssignment = isConsistent(problem, domainCopy, currentShift, currentHourNeighbors.get(neighborIndex), domainCopy.shiftDomains.get(currentShift).get(currentShiftDomainIndex), domainCopy.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).get(otherShiftDomainIndex));
-                        consistentAssignment = isConsistent(problem, assignmentToCheck, currentShift, currentHourNeighbors.get(neighborIndex));
-                       
-                        //If there is a violation in this assignment break the loop
-                        if(!consistentAssignment){
-                            break;
+                        if(!isConsistent(problem, assignmentToCheck, currentShift, currentHourNeighbors.get(neighborIndex))){
+                            consistentAssignment = false;
                         }
+*/
 
+                        //JUST NEED TO FIGURE OUT WHERE THIS BLOCK GOES
+                        if(isConsistent(problem, assignmentToCheck, currentShift, currentHourNeighbors.get(neighborIndex))){
+                            // If the code gets to this point, the tempory assignment has passed PC2 checks and is ready to be actually assigned
+                            
+                            //Assign the current variable that just passed the PC2 checks
+                            ArrayList<Integer> realVariableAssignment = new ArrayList<>();
+                            realVariableAssignment.add(domainCopy.shiftDomains.get(currentShift).get(currentShiftDomainIndex));
+                            domainCopy.shiftDomains.set(currentShift, realVariableAssignment);
+        
+                            //Recursive call
+                            shiftDomains result = backtrackPC2(problem, new shiftDomains(domainCopy), currentShift + 1);
+                            if (result != null){
+                                return result;
+                            }
+                        }
+                       
                     }//end otherShiftDomainIndex for
 
-                    //If there is a violation in this assignment break the loop
-                    if(!consistentAssignment){
-                        break;
-                    }
-
                 }//end neighborIndex for
-
-
-                // If the code gets to this point, the tempory assignment has passed PC2 checks and is ready to be actually assigned
-                
-                //Assign the current variable that just passed the PC2 checks
-                ArrayList<Integer> variableAssignment = new ArrayList<>();
-                variableAssignment.add(domainCopy.shiftDomains.get(currentShift).get(currentShiftDomainIndex));
-                domainCopy.shiftDomains.set(currentShift, variableAssignment);
-
-                //Recursive call
-                shiftDomains result = backtrackPC2(problem, new shiftDomains(domainCopy), currentShift + 1);
-                if (result != null){
-                    return result;
-                }
 
             }//end currentShiftDomainIndex for
 
