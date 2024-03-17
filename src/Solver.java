@@ -31,7 +31,7 @@ public class Solver {
         for(int i = 0; i < numShifts; i++){
             assignedShifts.add(-1);
         }
-        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains, counter);
+        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains, counter, verbosity);
 
         //checks the success of the backtracking MRV solver and prints the result
         if(result1 != null){
@@ -91,7 +91,7 @@ public class Solver {
         for(int i = 0; i < numShifts; i++){
             assignedShifts.add(-1);
         }
-        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains, counter);
+        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains, counter, verbosity);
 
         //checks the success of the backtracking MRV solver and prints the result
         if(result1 != null){
@@ -128,8 +128,8 @@ public class Solver {
 
 
     public static void main(String[] args) throws IOException{
-        runInstance(10,5, "5E 10S.txt",  0);
-        runInstance(25, 10, "10E 25S.txt",0);
+        runInstance(10,5, "5E 10S.txt",  1);
+        runInstance(25, 10, "10E 25S.txt",2);
         runInstance(25, 10, "10E 25S.txt", 6, 3,0);
         runInstance(25, 10, "10E 25S.txt", 12, 2,0);  //should fail
         runInstance(50, 15, "15E 50S.txt",0); //untested

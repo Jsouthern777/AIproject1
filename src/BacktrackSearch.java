@@ -7,12 +7,14 @@ import java.util.Set;
 
 public class BacktrackSearch {
 
-    public static shiftDomains backtrackMRV(SchedulingProblem problem, shiftDomains domains, final NodeCounter counter) {
+    public static shiftDomains backtrackMRV(SchedulingProblem problem, shiftDomains domains, final NodeCounter counter, int verbosity) {
 
         if (isComplete(domains)) {
             return domains;
         }
-
+        if(verbosity == 1){
+            System.out.println("For iteration " + counter.getMRVCount() + ":\n" + domains);
+        }
         int var = selectUnassignedVariable(domains, problem);
         ArrayList<Integer> orderedValues = domains.shiftDomains.get(var);
         for (int value : orderedValues) {
@@ -20,11 +22,14 @@ public class BacktrackSearch {
                 shiftDomains newDomains = new shiftDomains(domains);
                 newDomains.shiftDomains.get(var).clear(); //clears the hour selected
                 newDomains.shiftDomains.get(var).add(value); //adds the value to the previously cleared hour
+                if(verbosity == 2){
+                    System.out.println("Assigning variable " + value + " to " + var);
+                }
 
                 //forward checking
                 if(forwardCheck(problem, newDomains, var, value)){
                     counter.MRVNodeCount();
-                    shiftDomains result = backtrackMRV(problem, newDomains, counter);
+                    shiftDomains result = backtrackMRV(problem, newDomains, counter, verbosity);
                     if (result != null) {
                         return result;
                     }
