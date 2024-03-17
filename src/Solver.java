@@ -31,8 +31,11 @@ public class Solver {
         for(int i = 0; i < numShifts; i++){
             assignedShifts.add(-1);
         }
+        long startTime = System.nanoTime();
         shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains, counter, verbosity);
+        long endTime = System.nanoTime();
 
+        long duration1 = (endTime - startTime) / 1000000;
         //checks the success of the backtracking MRV solver and prints the result
         if(result1 != null){
             System.out.println("Result of backtracking MRV:\n" + result1);
@@ -42,14 +45,17 @@ public class Solver {
             System.out.println("No solution found for backtracking MRV");
             System.out.println("The MRV attempt generated " + counter.getMRVCount() + " nodes");
         }
-        
+
+        System.out.println("Attempt for MRV took " + endTime + " milliseconds");
 
         
         //Begin instance of Andrew's simple backtracking search using PC2
         int firstHour = 0;
         System.out.println("\n\n\nBEGINNING PC2 TEST\n");
+        long startTime2 = System.nanoTime();
         shiftDomains result2 = PC2.backtrackPC2(prob, startDomains, firstHour, counter, verbosity);
-
+        long endTime2  = System.nanoTime();
+        long duration2 = (endTime2 - startTime2) / 1000000;
 
         //checks the success of the backtracking PC2 solver and prints the result
         if(result2 != null){ 
@@ -63,6 +69,8 @@ public class Solver {
             System.out.println("The PC2 attempt generated " + counter.getPC2Count() + " nodes");
 
         }
+
+        System.out.println("Attempt for PC2 took " + duration2 + " milliseconds");
     }//end RunInstance
 
 
@@ -85,15 +93,10 @@ public class Solver {
         System.out.println("with maximum consecutive shifts of " + maxConsecutiveHours + "hours and at least " + minHoursBetweenShifts + " hours between shifts");
         System.out.println(startDomains); //for testing
 
-        
-        //Begin instance of Jackson's backtracking MRV search
-        ArrayList<Integer> assignedShifts = new ArrayList<>();
-        //initialize assignedShifts to allow setting each hour
-        for(int i = 0; i < numShifts; i++){
-            assignedShifts.add(-1);
-        }
+       long startTime = System.nanoTime();
         shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains, counter, verbosity);
-
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime) / 1000000;
         //checks the success of the backtracking MRV solver and prints the result
         if(result1 != null){
             System.out.println("Result of backtracking MRV:\n" + result1);
@@ -103,14 +106,18 @@ public class Solver {
             System.out.println("No solution found for backtracking MRV");
             System.out.println("The MRV attempt generated " + counter.getMRVCount() + " nodes");
         }
+
+        System.out.println("Attempt for MRV took " + duration + " milliseconds");
         
 
         
         //Begin instance of Andrew's simple backtracking search using PC2
         int firstHour = 0;
         System.out.println("\n\nBEGINNING PC2 TEST\n\n");
+        long startTime2 = System.nanoTime();
         shiftDomains result2 = PC2.backtrackPC2(prob, startDomains, firstHour, counter, verbosity);
-
+        long endTime2 = System.nanoTime();
+        long duration2 = (endTime2 - startTime2) / 1000000;
 
         //checks the success of the backtracking PC2 solver and prints the result
         if(result2 != null){ 
@@ -122,6 +129,7 @@ public class Solver {
             System.out.println("No solution found for PC2");
             System.out.println("The PC2 attempt generated " + counter.getPC2Count() + " nodes");
         }
+        System.out.println("Attempt for PC2 took " + duration2 + " milliseconds");
     }//end RunInstance
 
 
