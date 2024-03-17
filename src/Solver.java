@@ -15,7 +15,11 @@ public class Solver {
         //Initialize the domains from the input file
         shiftDomains startDomains = new shiftDomains(numShifts, numEmployees, availabilitiesFilename);
 
+        //Initialize the NodeCounter for analysis
+        NodeCounter counter = new NodeCounter();
+
         System.out.println("\n\nHere are the domains at the start of the problem " + availabilitiesFilename);
+        System.out.println("with maximum consecutive shifts of " + prob.getMaxConsecutiveHours() + "hours and at least " + prob.getMinBetweenShifts() + " hours between shifts");
         System.out.println(startDomains); //for testing
 
         
@@ -30,27 +34,34 @@ public class Solver {
         //checks the success of the backtracking MRV solver and prints the result
         if(result1 != null){
             System.out.println("Result of backtracking MRV:\n" + result1);
+            System.out.println("The MRV solution generated " + counter.getMRVCount() + " nodes");
         }
         else{
             System.out.println("No solution found for backtracking MRV");
+            System.out.println("The MRV attempt generated " + counter.getMRVCount() + " nodes");
         }
         
 
         
         //Begin instance of Andrew's simple backtracking search using PC2
         int firstHour = 0;
-        shiftDomains result2 = PC2.backtrackPC2(prob, startDomains, firstHour);
+        shiftDomains result2 = PC2.backtrackPC2(prob, startDomains, firstHour, counter);
 
 
         //checks the success of the backtracking PC2 solver and prints the result
         if(result2 != null){ 
            System.out.println("Here are the assignments after the PC2 search:");
            System.out.println(result2);
+           System.out.println("The PC2 solution generated " + counter.getPC2Count() + " nodes");
+
         }
         else{
             System.out.println("No solution found for PC2");
+            System.out.println("The PC2 attempt generated " + counter.getPC2Count() + " nodes");
+
         }
     }//end RunInstance
+
 
 
     //Overloaded method allowing to run the instance and change the shift assignment constraints
@@ -61,6 +72,9 @@ public class Solver {
 
         //Initialize the domains from the input file
         shiftDomains startDomains = new shiftDomains(numShifts, numEmployees, availabilitiesFilename);
+
+        //Initialize the NodeCounter for analysis
+        NodeCounter counter = new NodeCounter();
 
         System.out.println("\n\nHere are the domains at the beginning of the test " + availabilitiesFilename);
         System.out.println("with maximum consecutive shifts of " + maxConsecutiveHours + "hours and at least " + minHoursBetweenShifts + " hours between shifts");
@@ -78,25 +92,29 @@ public class Solver {
         //checks the success of the backtracking MRV solver and prints the result
         if(result1 != null){
             System.out.println("Result of backtracking MRV:\n" + result1);
+            System.out.println("The MRV solution generated " + counter.getMRVCount() + " nodes");
         }
         else{
             System.out.println("No solution found for backtracking MRV");
+            System.out.println("The MRV attempt generated " + counter.getMRVCount() + " nodes");
         }
         
 
         
         //Begin instance of Andrew's simple backtracking search using PC2
         int firstHour = 0;
-        shiftDomains result2 = PC2.backtrackPC2(prob, startDomains, firstHour);
+        shiftDomains result2 = PC2.backtrackPC2(prob, startDomains, firstHour, counter);
 
 
         //checks the success of the backtracking PC2 solver and prints the result
         if(result2 != null){ 
            System.out.println("This is the resulting solution following the PC2 search:");
            System.out.println(result2);
+           System.out.println("The PC2 solution generated " + counter.getPC2Count() + " nodes");
         }
         else{
             System.out.println("No solution found for PC2");
+            System.out.println("The PC2 attempt generated " + counter.getPC2Count() + " nodes");
         }
     }//end RunInstance
 

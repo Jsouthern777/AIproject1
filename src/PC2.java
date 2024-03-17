@@ -5,8 +5,9 @@ public class PC2 {
        
     //Attempts to solve a shift scheduling CSP. Starts at shift 0 and assigns shifts numerically starting at the lowest 
     //employee number. 
-    public static shiftDomains backtrackPC2(final SchedulingProblem  problem, final shiftDomains domains, final int nextHourToAssign){
-        
+    public static shiftDomains backtrackPC2(final SchedulingProblem  problem, final shiftDomains domains, final int nextHourToAssign, final NodeCounter counter){
+        counter.incrementPC2Count();
+
         //if assignment is complete then return the assignments
         if (nextHourToAssign == problem.getNumShifts()){
             return domains;
@@ -87,7 +88,7 @@ public class PC2 {
 
             //Recursive call
             //System.out.println("Making recursive call. CurrShift: " + currentShift + "\n");// + "\nDomain assignments:"+ recursiveDomains);
-            shiftDomains result = backtrackPC2(problem, new shiftDomains(tempDomains), currentShift + 1);
+            shiftDomains result = backtrackPC2(problem, new shiftDomains(tempDomains), currentShift + 1, counter);
             if (result != null){
                 return result;
             }
