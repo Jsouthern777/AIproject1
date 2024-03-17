@@ -112,7 +112,7 @@ public class BacktrackSearch {
                         //System.out.println("assignedShifts.get(" + j + ") is " + assignedShifts.get(j) + " which == " + person);
                         consecutiveHours++;
                        // System.out.println("consecutive Hours: " + consecutiveHours);
-                        if (consecutiveHours > 8){
+                        if (consecutiveHours > 8){ //ADB note : you could change the hard coded numbers to the ones in the problem variable
                             return false;
                         }
                     } else{
