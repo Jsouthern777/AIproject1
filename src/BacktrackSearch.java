@@ -47,7 +47,7 @@ public class BacktrackSearch {
                 ArrayList<Integer> currentDomain = updatedDomains.shiftDomains.get(hour);
 
                 //Check if the assigned value violates any constraints for that hour
-                if(!checkConstraints(hour, updatedDomains, problem)){
+                if(!isConsistent(problem, domains, hourToAssign, value)){
                     if(currentDomain.contains(value)){
                         int index = currentDomain.indexOf(value);
                         currentDomain.remove(index);
@@ -64,58 +64,7 @@ public class BacktrackSearch {
         return true;
     }
 
-//    private static boolean forwardCheck(SchedulingProblem problem, shiftDomains domains, int var, int value) {
-//        // Iterate over the unassigned variables affected by the assignment of the current variable
-//        for (int neighborVar : getAffectedVariables(problem, var)) {
-//            if (!domains.shiftDomains.contains(neighborVar)) {
-//                // Remove the assigned value from the domain of the unassigned variable
-//                domains.shiftDomains.get(neighborVar).remove(Integer.valueOf(value));
-//                if(domains.shiftDomains.get(neighborVar).isEmpty()){
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
-//    }
 
-    private static List<Integer> getAffectedVariables(SchedulingProblem problem, int var) {
-        List<Integer> affectedVariables = new ArrayList<>();
-
-        // Consider shifts occurring immediately before or after the assigned shift
-        if (var > 0) {
-            affectedVariables.add(var - 1); // Shift before the assigned shift
-        }
-        if (var < problem.getNumShifts() - 1) {
-            affectedVariables.add(var + 1); // Shift after the assigned shift
-        }
-
-        // Consider shifts occurring during the break period after the assigned shift
-        int breakEnd = var + problem.getMinBetweenShifts(); // Calculate the end of the break period
-        for (int i = var + 1; i < breakEnd && i < problem.getNumShifts(); i++) {
-            affectedVariables.add(i);
-        }
-
-        return affectedVariables;
-    }
-
-    public static Boolean checkConstraints(int hour, shiftDomains updatedDomains, SchedulingProblem problem){
-        ArrayList<Integer> domain  = updatedDomains.shiftDomains.get(hour);
-
-        for(int employee: domain){
-            int consecutiveShifts = 0;
-            for(int i = hour; i < updatedDomains.shiftDomains.size(); i++){
-                if(updatedDomains.shiftDomains.get(i).contains(employee)){
-                    consecutiveShifts++;
-                } else{
-                    break;
-                }
-            }
-            if(consecutiveShifts >= problem.getMaxConsecutiveHours()){
-                return false;
-            }
-        }
-        return true;
-    }
     private static boolean isComplete(shiftDomains domains) {
         // Check if all variables are assigned
         for (ArrayList<Integer> domain : domains.shiftDomains) {
@@ -166,22 +115,22 @@ public class BacktrackSearch {
                 constraintCount++;
             }
         }
-        //constraint 2
-//        for(int employee: domain){
-//            int lastAssignedIndex = -1;
-//            for(int i = var - 1; i >= 0; i--){
-//                if(domains.shiftDomains.get(i).contains(employee)){
-//                    lastAssignedIndex = i;
-//                    break;
-//                }
-//            }
-//            if(lastAssignedIndex != -1 && var - lastAssignedIndex <= problem.getMaxConsecutiveHours()){
-//                int breakDuration = var - lastAssignedIndex - 1; // Calculate the break duration
-//                if (breakDuration < problem.getMinBetweenShifts()) {
-//                    constraintCount++;
-//                }
-//            }
-//        }
+       // constraint 2
+        for(int employee: domain){
+            int lastAssignedIndex = -1;
+            for(int i = var - 1; i >= 0; i--){
+                if(domains.shiftDomains.get(i).contains(employee)){
+                    lastAssignedIndex = i;
+                    break;
+                }
+            }
+            if(lastAssignedIndex != -1 && var - lastAssignedIndex <= problem.getMaxConsecutiveHours()){
+                int breakDuration = var - lastAssignedIndex - 1; // Calculate the break duration
+                if (breakDuration < problem.getMinBetweenShifts()) {
+                    constraintCount++;
+                }
+            }
+        }
         return constraintCount;
     }
 
@@ -206,25 +155,48 @@ public class BacktrackSearch {
             }
         }
 
-        // Check constraint: At least 12 hours between consecutive shifts for the same person
-//        if (var > 0) {
-//            // Find the last time the person was assigned
-//            int lastAssignedIndex = -1;
-//            for (int i = var - 1; i >= 0; i--) {
-//                if (domains.shiftDomains.get(i).contains(value)) {
-//                    lastAssignedIndex = i;
-//                    break;
-//                }
-//            }
-//
-//            // If the person was assigned within the last 8 shifts, check for the break duration
-//            if (lastAssignedIndex != -1 && var - lastAssignedIndex <= problem.getMaxConsecutiveHours()) {
-//                int breakDuration = var - lastAssignedIndex - 1; // Calculate the break duration
-//                if (breakDuration < problem.getMinBetweenShifts()) {
-//                    return false; // Break duration is less than the required minimum
-//                }
-//            }
-//        }
+         //Check constraint: At least 12 hours break after 8 consecutive shifts for the same person
+        int  lastAssignedIndex = -1;
+
+        //iterate through each hour's domain starting from last hour
+        for(int hour = domains.shiftDomains.size()-1; hour >= 0; hour--){
+            ArrayList<Integer> domain2 = domains.shiftDomains.get(hour);
+
+            //Checks if domain of a particular hour solely contains that value
+            if(domain2.size() == 1 && domain.contains(value)){
+                lastAssignedIndex = hour;
+                break;
+            }
+        }
+        //if no assignment found, constraint is satisfied
+        if(lastAssignedIndex == -1){
+            return true;
+        }
+
+        //Checks if they worked 8 consecutive hours before and including the last assignment
+        int consecutiveHoursWorked = 0;
+        for(int hour = lastAssignedIndex; hour >= 0; hour--){
+            ArrayList<Integer> domain3 = domains.shiftDomains.get(hour);
+
+            //Checks if the assigned value is in the domain
+            if(domain3.contains(value)){
+                consecutiveHoursWorked++;
+                if(consecutiveHoursWorked >= problem.getMaxConsecutiveHours()){
+                    break; //worked max consecutive hours
+                }
+            } else{
+                consecutiveHoursWorked = 0;
+            }
+        }
+
+        //Checks if there exists a minimum 12 hour break
+        if(consecutiveHoursWorked >= problem.getMaxConsecutiveHours()){
+            if(lastAssignedIndex - consecutiveHoursWorked >= problem.getMinBetweenShifts()){
+                return true;
+            } else{
+                return false;
+            }
+        }
 
         return true;
     }
