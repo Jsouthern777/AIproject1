@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 
 /*
@@ -33,6 +35,8 @@ public class PC2 {
         shiftDomains domainCopy = new shiftDomains(domains);
         ArrayList<Integer> currentHourNeighbors = getForwardNeighbors(problem, currentShift);
 
+        Queue<Integer> pairsToCheck;
+
 
         //Beginning of mega stacked for loop. Outer loop iterates through the current shift being assigned's domain. 
         //The next inner layer iterates through the neighbors that need to be checked, and the inner-most loop
@@ -42,6 +46,7 @@ public class PC2 {
             for(int currentShiftDomainIndex = 0; currentShiftDomainIndex < domainCopy.shiftDomains.get(currentShift).size(); currentShiftDomainIndex++){
                 
                 shiftDomains tempDomains = new shiftDomains(domainCopy);
+                pairsToCheck = new LinkedList<>();
 
                 //Assign the current shift for checking
                 ArrayList<Integer> tempCurrentAssignment = new ArrayList<>();
@@ -54,48 +59,85 @@ public class PC2 {
                     //Loop through the other hour being checked's domain
                     for(int otherShiftDomainIndex = 0; otherShiftDomainIndex < tempDomains.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).size(); otherShiftDomainIndex++){
 
-                        //Make the temporary assignments in a new copy of the domain
-                        shiftDomains assignmentToCheck = new shiftDomains(tempDomains);
+                        //add the current shift
+                        pairsToCheck.add(currentShift);
 
-                        //Assign the other shift for checking
-                        ArrayList<Integer> variableAssignment = new ArrayList<>();
-                        variableAssignment.add(tempDomains.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).get(otherShiftDomainIndex));
-                        assignmentToCheck.shiftDomains.set(currentHourNeighbors.get(neighborIndex),variableAssignment);
+                        //add the current employee
+                        pairsToCheck.add(tempDomains.shiftDomains.get(currentShift).get(0));
 
+                        //add the other shift
+                        pairsToCheck.add(currentHourNeighbors.get(neighborIndex));
 
-                        //Check the path consistency of the current 2 variable temporary assignment
-                        if(!isConsistent(problem, assignmentToCheck, currentShift, currentHourNeighbors.get(neighborIndex))){
+                        //add the other employee
+                        pairsToCheck.add(tempDomains.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).get(otherShiftDomainIndex));
 
-                            if(verbosity == 2){
-                                System.out.print("Just checked current Shift:" + currentShift + " current employee:" + assignmentToCheck.shiftDomains.get(currentShift).get(0));
-                                System.out.println(" and other Shift:" + currentHourNeighbors.get(neighborIndex) + " other employee:" + assignmentToCheck.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).get(0));
-                                System.out.println("It was inconsistent. Now trying the next pair of potential assignments");
-                            }
-                            
-                            //domain is inconsistent so remove it 
-                            tempDomains.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).remove(otherShiftDomainIndex);
+                        //add other shift domain index
+                        pairsToCheck.add(otherShiftDomainIndex);
 
-                            //If any neighbor runs out of possible employees, this assignment
-                            if(tempDomains.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).size() <= 0){
-                                if(verbosity == 2){
-                                    System.out.println("Shift " + currentHourNeighbors.get(neighborIndex) + "'s domain is empty, returning null");
-                                }
-                                return null;
-                            }
-                            otherShiftDomainIndex--; //account for variable removal
-                        }
-                        else{
-                            if(verbosity == 2){
-                                System.out.print("Just checked current Shift:" + currentShift + " current employee:" + assignmentToCheck.shiftDomains.get(currentShift).get(0));
-                                System.out.println(" and other Shift:" + currentHourNeighbors.get(neighborIndex) + " other employee:" + assignmentToCheck.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).get(0));
-                                System.out.println("It was consistent");
-                            }
-                        }
-                       
                     }//end otherShiftDomainIndex for
 
                 }//end neighborIndex for
 
+
+            //The queue is now initially loaded with all of the pairs to check
+
+            int currShift, otherShift, currEmp, otherEmp, otherShiftDomainIndex;
+
+            ArrayList<Integer> removalCorrections = new ArrayList<>();
+            for(int i = 0; i <= currentHourNeighbors.size() + 1; i++){
+                removalCorrections.add(0);
+            }
+
+            while(pairsToCheck.size() > 4){
+                currShift = pairsToCheck.remove();
+                currEmp = pairsToCheck.remove();
+                otherShift = pairsToCheck.remove();
+                otherEmp = pairsToCheck.remove();
+                otherShiftDomainIndex = pairsToCheck.remove();
+
+            //Make the temporary assignments in a new copy of the domain
+            shiftDomains assignmentToCheck = new shiftDomains(tempDomains);
+
+            //Assign the other shift for checking
+            ArrayList<Integer> variableAssignment = new ArrayList<>();
+            variableAssignment.add(otherEmp);
+            assignmentToCheck.shiftDomains.set(otherShift,variableAssignment);
+
+
+            //Check the path consistency of the current 2 variable temporary assignment
+            if(!isConsistent(problem, assignmentToCheck, currShift, otherShift)){
+
+                if(verbosity == 2){
+                    System.out.print("Just checked current Shift:" + currShift + " current employee:" + currEmp);
+                    System.out.println(" and other Shift:" + otherShift + " other employee:" + otherEmp);
+                    System.out.println("It was inconsistent. Now trying the next pair of potential assignments");
+                }
+                
+                //domain is inconsistent so remove it 
+                tempDomains.shiftDomains.get(otherShift).remove(otherShiftDomainIndex - removalCorrections.get(otherShift - currShift));
+                //if you remove something, that domain shrinks so the saved value in the queue will be wrong
+                removalCorrections.set((otherShift - currShift), removalCorrections.get((otherShift - currShift)) +1);
+
+                //If any neighbor runs out of possible employees, this assignment is wrong
+                if(tempDomains.shiftDomains.get(otherShift).size() <= 0){
+                    if(verbosity == 2){
+                        System.out.println("Shift " + otherShift + "'s domain is empty, returning null");
+                    }
+                    return null;
+                }
+
+            }
+            else{
+                if(verbosity == 2){
+                    System.out.print("Just checked current Shift:" + currShift + " current employee:" + currEmp);
+                    System.out.println(" and other Shift:" + otherShift + " other employee:" + otherEmp);
+                    System.out.println("It was consistent");
+                }
+            }
+        }
+
+
+            //If the code makes it to here, all of the domains have been reduced so that they are path consistent with the current shift assignment
 
             //Recursive call
             if(verbosity == 2){
