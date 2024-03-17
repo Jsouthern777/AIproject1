@@ -27,6 +27,7 @@ public class PC2 {
             System.out.println("A recursive call was just made, here are the current domains:\n" + domains);
         }
 
+
         //if assignment is complete then return the assignments
         if (nextHourToAssign == problem.getNumShifts()){
             return domains;
@@ -41,7 +42,8 @@ public class PC2 {
         //Beginning of mega stacked for loop. Outer loop iterates through the current shift being assigned's domain. 
         //The next inner layer iterates through the neighbors that need to be checked, and the inner-most loop
         //iterates through the domains of that other neighbor to be checked
-        
+
+                
         //Loop through and check all of the children of the current hour being assigned 
             for(int currentShiftDomainIndex = 0; currentShiftDomainIndex < domainCopy.shiftDomains.get(currentShift).size(); currentShiftDomainIndex++){
                 
@@ -89,6 +91,8 @@ public class PC2 {
             }
 
             while(pairsToCheck.size() > 4){
+
+
                 currShift = pairsToCheck.remove();
                 currEmp = pairsToCheck.remove();
                 otherShift = pairsToCheck.remove();
