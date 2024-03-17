@@ -132,6 +132,7 @@ private static boolean isConsistent(SchedulingProblem problem, shiftDomains doma
         boolean firstShiftStarted = false;
         int earliestShiftToCheck;
         int mostRecentOtherShift = Integer.MIN_VALUE;
+        boolean sameAssignment = (currentEmployee == otherEmployee);
         
 
         //Determine the earliest assignment that is relavent to the current assignment
@@ -144,6 +145,8 @@ private static boolean isConsistent(SchedulingProblem problem, shiftDomains doma
 
         for(int shiftToCheck = earliestShiftToCheck; shiftToCheck <= currentShift; shiftToCheck++){
 
+            //This is currently breaking because it doesn't get to the appropriate check for minTimeBetween since it takes other employee or just firstshiftstarted elif
+
             //Need to evaluate the current assignments, can assume everything previous is consistent
             if(!firstShiftEnded && (domain.shiftDomains.get(shiftToCheck).get(0) == currentEmployee)){
                 currConsecutiveShiftsCount++;
@@ -153,15 +156,15 @@ private static boolean isConsistent(SchedulingProblem problem, shiftDomains doma
                 firstShiftStarted = true;
             }
             //else if means that this is exclusively for otherEmployee != currentEmployee
-            else if(domain.shiftDomains.get(shiftToCheck).get(0) == otherEmployee){
+            else if(!sameAssignment && (domain.shiftDomains.get(shiftToCheck).get(0) == otherEmployee)){
                 mostRecentOtherShift = shiftToCheck;
                 }
-            else if(firstShiftStarted){ //only get here if the shift to check != current employee
-                firstShiftEnded = true;
-            }
             //If the first shift has ended already and we have another assignment, that violates the min time between shifts
             else if(firstShiftEnded && (domain.shiftDomains.get(shiftToCheck).get(0) == currentEmployee)){
                 return false;
+            }
+            else if(firstShiftStarted){ //only get here if the shift to check != current employee
+                firstShiftEnded = true;
             }
             //No else needed, if this shift is assigned to another employee then its fine
 
@@ -169,7 +172,7 @@ private static boolean isConsistent(SchedulingProblem problem, shiftDomains doma
 
         //Do some final checks after the loop
         //Check the case where the two assignments are the same
-        if(currentEmployee == otherEmployee){
+        if(sameAssignment){
             currConsecutiveShiftsCount++;
             if(currConsecutiveShiftsCount > problem.getMaxConsecutiveHours()){
                 return false;
