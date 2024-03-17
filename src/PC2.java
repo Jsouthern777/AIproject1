@@ -11,73 +11,58 @@ public class PC2 {
         if (nextHourToAssign == problem.getNumShifts()){
             return domains;
         }
-        int hoursBetweenShifts = problem.getMinBetweenShifts();
-        int maxConsecutiveHours = problem.getMaxConsecutiveHours();
-
+        int currentShift = nextHourToAssign;
         shiftDomains domainCopy = new shiftDomains(domains);
-        ArrayList<Integer> currentHourNeighbors = getForwardNeighbors(problem, nextHourToAssign);
+        ArrayList<Integer> currentHourNeighbors = getForwardNeighbors(problem, currentShift);
+
+        boolean consistentAssignment = true;
 
 
         //Beginning of mega stacked for loop. Outer loop iterates through the current shift being assigned's domain. 
         //The next inner layer iterates through the neighbors that need to be checked, and the inner-most loop
         //iterates through the domains of that other neighbor to be checked
-
-        //Initialize variables needed in the mega loop
-        int consecutiveShiftsCount = 1;
-        int hoursBetweenShiftsCount = 0;
-        boolean firstShiftEnded = false;
-        boolean inconsistentAssignment = false;
-
-            //Loop through and check all of the children of the current hour being assigned 
-            for(int currentShiftDomainIndex = 0; currentShiftDomainIndex < domainCopy.shiftDomains.get(nextHourToAssign).size(); currentShiftDomainIndex++){
+        
+        //Loop through and check all of the children of the current hour being assigned 
+            for(int currentShiftDomainIndex = 0; currentShiftDomainIndex < domainCopy.shiftDomains.get(currentShift).size(); currentShiftDomainIndex++){
                 
-                //Reset this between checking each child
-                inconsistentAssignment = false;
-
                 //Loop through the neighbors of the current hour being assigned
                 for(int neighborIndex = 0; neighborIndex < currentHourNeighbors.size(); neighborIndex++){
 
                     //path consistency for this algorithm means checking them against each other and forward checking the neighbors' neighbors with both assignments
                     //only makes a path (triangle) if it is in both neighbors lists. 
-                    //Make an is consistent method that takes in two assignments
-                    ArrayList<Integer> otherHourNeighbors = getForwardNeighbors(problem, currentHourNeighbors.get(neighborIndex));
-
+                    //Make an is consistent method that takes in two assignment
                 
                     //Loop through the other hour being checked's domain
                     for(int otherShiftDomainIndex = 0; otherShiftDomainIndex < domainCopy.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).size(); otherShiftDomainIndex++){
 
-                        //Check for number of consecutive shifts
-                        //If the original shift is still going and current value being checked if the same as the next shift increment the consecutive counter
-                        if(!firstShiftEnded && (domainCopy.shiftDomains.get(nextHourToAssign).get(currentShiftDomainIndex) == domainCopy.shiftDomains.get(currentHourNeighbors.get((neighborIndex))).get(otherShiftDomainIndex))){
-                            consecutiveShiftsCount++;
-                        }
 
-                        //Check if the consecutive shift constraint has been violated, remove this option
-                        if(consecutiveShiftsCount >= maxConsecutiveHours){
-                            inconsistentAssignment = true;
-                            break;
-                        }
+                        //Make the temporary assignments in a new copy of the domain
+                        shiftDomains assignmentToCheck = new shiftDomains(domainCopy);
 
-                        //This runs the first time that a following shift is assigned to a different employee
-                        else if(!firstShiftEnded){
-                            firstShiftEnded = true;
-                        }
+                        //Assign the current shift for checking
+                        ArrayList<Integer> variableAssignment = new ArrayList<>();
+                        variableAssignment.add(domainCopy.shiftDomains.get(currentShift).get(currentShiftDomainIndex));
+                        assignmentToCheck.shiftDomains.set(currentShift, variableAssignment);
 
-                        //Check for hours between shifts
-                        //If there is still a gap between shifts then increment that counter 
-                        if(firstShiftEnded && (domainCopy.shiftDomains.get(nextHourToAssign).get(currentShiftDomainIndex) != domainCopy.shiftDomains.get(currentHourNeighbors.get((neighborIndex))).get(otherShiftDomainIndex))){
-                            hoursBetweenShiftsCount++;
-                        }
-                        //Check if the gap between shifts constraint has been violated
-                        else if(firstShiftEnded && (hoursBetweenShiftsCount < hoursBetweenShifts)){
-                            inconsistentAssignment = true;
+                        //Assign the other shift for checking
+                        variableAssignment = new ArrayList<>();
+                        variableAssignment.add(domainCopy.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).get(otherShiftDomainIndex));
+                        assignmentToCheck.shiftDomains.set(currentHourNeighbors.get(neighborIndex),variableAssignment);
+
+
+                        //Check consistency of the potential current shift assignment and the potential second shift assignment     
+                        //consistentAssignment = isConsistent(problem, domainCopy, currentShift, currentHourNeighbors.get(neighborIndex), domainCopy.shiftDomains.get(currentShift).get(currentShiftDomainIndex), domainCopy.shiftDomains.get(currentHourNeighbors.get(neighborIndex)).get(otherShiftDomainIndex));
+                        consistentAssignment = isConsistent(problem, assignmentToCheck, currentShift, currentHourNeighbors.get(neighborIndex));
+                       
+                        //If there is a violation in this assignment break the loop
+                        if(!consistentAssignment){
                             break;
                         }
 
                     }//end otherShiftDomainIndex for
 
-                    //If this assignment has already failed, break out of the nested loop
-                    if(inconsistentAssignment){
+                    //If there is a violation in this assignment break the loop
+                    if(!consistentAssignment){
                         break;
                     }
 
@@ -88,11 +73,11 @@ public class PC2 {
                 
                 //Assign the current variable that just passed the PC2 checks
                 ArrayList<Integer> variableAssignment = new ArrayList<>();
-                variableAssignment.add(domainCopy.shiftDomains.get(nextHourToAssign).get(currentShiftDomainIndex));
-                domainCopy.shiftDomains.set(nextHourToAssign, variableAssignment);
+                variableAssignment.add(domainCopy.shiftDomains.get(currentShift).get(currentShiftDomainIndex));
+                domainCopy.shiftDomains.set(currentShift, variableAssignment);
 
                 //Recursive call
-                shiftDomains result = backtrackPC2(problem, new shiftDomains(domainCopy), nextHourToAssign + 1);
+                shiftDomains result = backtrackPC2(problem, new shiftDomains(domainCopy), currentShift + 1);
                 if (result != null){
                     return result;
                 }
@@ -100,71 +85,13 @@ public class PC2 {
             }//end currentShiftDomainIndex for
 
 
-            /* 
-            //Load the neighbors. This assumes time between shifts is greater than the longest allowable shift 
-            
-            
 
-            //Checks if there are at least 'hoursBetweenShifts' shifts before and after the current shift being assigned
-            if((nextHourToAssign < (problem.getNumShifts() - 1 - hoursBetweenShifts)) && (nextHourToAssign > (hoursBetweenShifts - 1))){
-                for(int i = 1; i < hoursBetweenShifts + 1; i++){
-                    neighbors.add(nextHourToAssign + i);
-                    neighbors.add(nextHourToAssign - i);
-                }
-            }
-            //Checks if the current shift is near the start 
-            else if(nextHourToAssign < (problem.getNumShifts() - 1 - hoursBetweenShifts)){
-                for(int i = 1; i < hoursBetweenShifts + 1; i++){
-                    neighbors.add(nextHourToAssign + i);
-                    if((nextHourToAssign - i) >= 0){
-                        neighbors.add(nextHourToAssign - i);
-                    }
-                    else{
-                        break; //once an assignment is too close to a boundary it doesn't need to both checking anything further
-                    }
-                }
-            }
-            //Checks if the current shift is near the end
-            else if(nextHourToAssign > (hoursBetweenShifts - 1)){
-                for(int i = 1; i < hoursBetweenShifts + 1; i++){
-                    neighbors.add(nextHourToAssign - i);
-                    if((nextHourToAssign + i) <= problem.getNumShifts() - 1){
-                        neighbors.add(nextHourToAssign + i);
-                    }
-                    else{
-                        break;
-                    }
-                }
-            }
-            else{ //The number of shifts is too low so add all neighbors
-                for(int i = 0; i < problem.getNumShifts(); i++){
-                    if(nextHourToAssign != i){
-                        neighbors.add(i);
-                    }
-                }
-            }
-            //end of adding neighbors
-            */
-            
-            
-
-            /*
-            //Assign the current variable that just passed the PC2 checks
-            ArrayList<Integer> variableAssignment = new ArrayList<>();
-            variableAssignment.add(domainCopy.shiftDomains.get(nextHourToAssign).get(domainIndex));
-            domainCopy.shiftDomains.set(nextHourToAssign, variableAssignment);
-
-            //Recursive call
-            shiftDomains result = backtrackPC2(problem, new shiftDomains(domainCopy), nextHourToAssign + 1);
-            if (result != null){
-                return result;
-            }
-            */
-
-        //If the code gets to this point, it checked all of the children and there are no solutions with the current assignment
+            //If the code gets to this point, it checked all of the children and there are no solutions with the current assignment
         return null;
 
     }//end backtrackPC2
+
+
 
 
     //Returns a list of neighboring shifts. This assumes time between shifts is greater than the longest allowable shift 
@@ -218,6 +145,8 @@ public class PC2 {
     }//end getNeighbors
 
 
+
+
    //Returns a list of neighboring shifts. This assumes time between shifts is greater than the longest allowable shift 
    private static ArrayList<Integer> getForwardNeighbors(SchedulingProblem problem, int shift){
 
@@ -244,15 +173,73 @@ public class PC2 {
 
 
 
-//This method checks to see if the 
-private static boolean isConsistent(SchedulingProblem problem, shiftDomains domain, int currentShift, int otherShift, int currentEmployee, int otherEmployee){
+
+//This method checks to see if the potential assignment pair is consistent with everything else
+//This assumes that all shifts previous to current shift have been assigned (which is how its been structured thus far)
+private static boolean isConsistent(SchedulingProblem problem, shiftDomains domain, int currentShift, int otherShift){
     
-    //need to check chronologically earlier ones for consistency because later assignments aren't determined yet
+        int currentEmployee = domain.shiftDomains.get(currentShift).get(0);
+        int otherEmployee = domain.shiftDomains.get(otherShift).get(0);
+
+        //Initialize consistency variables
+        int currConsecutiveShiftsCount = 0;
+        boolean firstShiftEnded = false;
+        boolean firstShiftStarted = false;
+        int earliestShiftToCheck;
+        int mostRecentOtherShift = Integer.MIN_VALUE;
+        
+
+        //Determine the earliest assignment that is relavent to the current assignment
+        if((currentShift - problem.getMinBetweenShifts() - 1) <= 0){  //check the <= here if buggy
+            earliestShiftToCheck = 0;
+        }
+        else{
+            earliestShiftToCheck = currentShift - problem.getMinBetweenShifts();
+        }
+
+        for(int shiftToCheck = earliestShiftToCheck; shiftToCheck <= currentShift; shiftToCheck++){
+
+            //Need to evaluate the current assignments, can assume everything previous is consistent
+            if(!firstShiftEnded && (domain.shiftDomains.get(shiftToCheck).get(0) == currentEmployee)){
+                currConsecutiveShiftsCount++;
+                if(currConsecutiveShiftsCount > problem.getMaxConsecutiveHours()){
+                    return false;
+                }
+                firstShiftStarted = true;
+            }
+            //else if means that this is exclusively for otherEmployee != currentEmployee
+            else if(domain.shiftDomains.get(shiftToCheck).get(0) == otherEmployee){
+                mostRecentOtherShift = shiftToCheck;
+                }
+            else if(firstShiftStarted){ //only get here if the shift to check != current employee
+                firstShiftEnded = true;
+            }
+            //If the first shift has ended already and we have another assignment, that violates the min time between shifts
+            else if(firstShiftEnded && (domain.shiftDomains.get(shiftToCheck).get(0) == currentEmployee)){
+                return false;
+            }
+            //No else needed, if this shift is assigned to another employee then its fine
+
+        }//end for loop
+
+        //Do some final checks after the loop
+        //Check the case where the two assignments are the same
+        if(currentEmployee == otherEmployee){
+            currConsecutiveShiftsCount++;
+            if(currConsecutiveShiftsCount > problem.getMaxConsecutiveHours()){
+                return false;
+            }
+        }
+
+        //Check if the other employee was previously assigned too recently
+        if((otherShift - mostRecentOtherShift) < problem.getMinBetweenShifts()){
+            return false;
+        }
 
 
     //If it makes it to this point, it has survived the consistency checks
     return true;
-}
+}//end isConsistent
 
 
 
