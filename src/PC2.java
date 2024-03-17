@@ -1,11 +1,25 @@
 import java.util.ArrayList;
 import java.util.List;
 
+
+/*
+ * @Author Andrew Bergey
+ * 
+ * 
+ * This class implements a simple backtracking search that uses PC2 as its consistency check. It assigns the shifts in numerical
+ * order starting at shift 0. It attempts to assign employees starting from the lowest employee number. 
+ * 
+ * This code refers to the PC2 pseudocode and examples found on slides 18-20 from https://canvas.auckland.ac.nz/courses/60536/files/7516963/download?download_frd=1#:~:text=The%20PC2%20algorithm%20achieves%20path,values%20that%20violates%20path%20consistency.
+ * I used the general structure of this algorithm but modified it to fit this problem. I check all paris of X1 and X2 and removed
+ * the nodes that were inconsistent with both assignments and if no consistent assignments are remaining, then it returns null 
+ * 
+ */
+
 public class PC2 {
        
     //Attempts to solve a shift scheduling CSP. Starts at shift 0 and assigns shifts numerically starting at the lowest 
     //employee number. 
-    public static shiftDomains backtrackPC2(final SchedulingProblem  problem, final shiftDomains domains, final int nextHourToAssign, final NodeCounter counter){
+    public static shiftDomains backtrackPC2(final SchedulingProblem  problem, final shiftDomains domains, final int nextHourToAssign, final NodeCounter counter, final int verbosity){
         counter.incrementPC2Count();
 
         //if assignment is complete then return the assignments
