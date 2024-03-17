@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Solver {
 //same problem will be solved multiple times by both algorithms, so generate availabilities,
 // numEmployees, numShifts, and startTime here
-    public static void runInstance(final int numShifts, final int numEmployees, String availabilitiesFilename) throws IOException{
+    public static void runInstance(final int numShifts, final int numEmployees, String availabilitiesFilename, int verbosity) throws IOException{
         
         //Initialize the problem
         SchedulingProblem prob = new SchedulingProblem(numShifts, numEmployees);
@@ -17,6 +17,8 @@ public class Solver {
 
         //Initialize the NodeCounter for analysis
         NodeCounter counter = new NodeCounter();
+
+
 
         System.out.println("\n\nHere are the domains at the start of the problem " + availabilitiesFilename);
         System.out.println("with maximum consecutive shifts of " + prob.getMaxConsecutiveHours() + "hours and at least " + prob.getMinBetweenShifts() + " hours between shifts");
@@ -29,7 +31,7 @@ public class Solver {
         for(int i = 0; i < numShifts; i++){
             assignedShifts.add(-1);
         }
-        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains);
+        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains, counter);
 
         //checks the success of the backtracking MRV solver and prints the result
         if(result1 != null){
@@ -65,7 +67,7 @@ public class Solver {
 
 
     //Overloaded method allowing to run the instance and change the shift assignment constraints
-    public static void runInstance(final int numShifts, final int numEmployees, String availabilitiesFilename, final int minHoursBetweenShifts, final int maxConsecutiveHours ) throws IOException{
+    public static void runInstance(final int numShifts, final int numEmployees, String availabilitiesFilename, final int minHoursBetweenShifts, final int maxConsecutiveHours, int verbosity) throws IOException{
         
         //Initialize the problem
         SchedulingProblem prob = new SchedulingProblem(numShifts, numEmployees, minHoursBetweenShifts, maxConsecutiveHours);
@@ -75,6 +77,8 @@ public class Solver {
 
         //Initialize the NodeCounter for analysis
         NodeCounter counter = new NodeCounter();
+
+
 
         System.out.println("\n\nHere are the domains at the beginning of the test " + availabilitiesFilename);
         System.out.println("with maximum consecutive shifts of " + maxConsecutiveHours + "hours and at least " + minHoursBetweenShifts + " hours between shifts");
@@ -87,7 +91,7 @@ public class Solver {
         for(int i = 0; i < numShifts; i++){
             assignedShifts.add(-1);
         }
-        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains);
+        shiftDomains result1 = BacktrackSearch.backtrackMRV(prob,startDomains, counter);
 
         //checks the success of the backtracking MRV solver and prints the result
         if(result1 != null){
@@ -124,11 +128,11 @@ public class Solver {
 
 
     public static void main(String[] args) throws IOException{
-        runInstance(10,5, "5E 10S.txt");
-        runInstance(25, 10, "10E 25S.txt");
-        runInstance(25, 10, "10E 25S.txt", 6, 3);
-        runInstance(25, 10, "10E 25S.txt", 12, 2);  //should fail
-        runInstance(50, 15, "15E 50S.txt"); //untested
+        runInstance(10,5, "5E 10S.txt",  0);
+        runInstance(25, 10, "10E 25S.txt",0);
+        runInstance(25, 10, "10E 25S.txt", 6, 3,0);
+        runInstance(25, 10, "10E 25S.txt", 12, 2,0);  //should fail
+        runInstance(50, 15, "15E 50S.txt",0); //untested
         //runInstance(100, 30, "30E 100S.txt");
         //runInstance(200, 30, "30E 200S.txt");
     }

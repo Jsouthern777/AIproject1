@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class BacktrackSearch {
 
-    public static shiftDomains backtrackMRV(SchedulingProblem problem, shiftDomains domains) {
+    public static shiftDomains backtrackMRV(SchedulingProblem problem, shiftDomains domains, final NodeCounter counter) {
 
         if (isComplete(domains)) {
             return domains;
@@ -23,7 +23,8 @@ public class BacktrackSearch {
 
                 //forward checking
                 if(forwardCheck(problem, newDomains, var, value)){
-                    shiftDomains result = backtrackMRV(problem, newDomains);
+                    counter.MRVNodeCount();
+                    shiftDomains result = backtrackMRV(problem, newDomains, counter);
                     if (result != null) {
                         return result;
                     }
@@ -163,7 +164,7 @@ public class BacktrackSearch {
             ArrayList<Integer> domain2 = domains.shiftDomains.get(hour);
 
             //Checks if domain of a particular hour solely contains that value
-            if(domain2.size() == 1 && domain.contains(value)){
+            if(domain2.size() == 1 && domain2.contains(value)){
                 lastAssignedIndex = hour;
                 break;
             }
@@ -189,7 +190,7 @@ public class BacktrackSearch {
             }
         }
 
-        //Checks if there exists a minimum 12 hour break
+        //Checks if there exists a minimum 12 hour break after working an 8 hour shift
         if(consecutiveHoursWorked >= problem.getMaxConsecutiveHours()){
             if(lastAssignedIndex - consecutiveHoursWorked >= problem.getMinBetweenShifts()){
                 return true;
