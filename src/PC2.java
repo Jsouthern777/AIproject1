@@ -92,61 +92,6 @@ public class PC2 {
     }//end backtrackPC2
 
 
-
-
-    //Returns a list of neighboring shifts. This assumes time between shifts is greater than the longest allowable shift 
-    private static ArrayList<Integer> getNeighbors(SchedulingProblem problem, int shift){
-
-        //Import the problem constraints
-        int hoursBetweenShifts = problem.getMinBetweenShifts();
-
-        ArrayList<Integer> neighbors = new ArrayList<>();
-           
-        //Checks if there are at least 'hoursBetweenShifts' shifts before and after the current shift being assigned
-        if((shift < (problem.getNumShifts() - 1 - hoursBetweenShifts)) && (shift > (hoursBetweenShifts - 1))){
-            for(int i = 1; i < hoursBetweenShifts + 1; i++){
-                neighbors.add(shift + i);
-                neighbors.add(shift - i);
-            }
-        }
-        //Checks if the current shift is near the start 
-        else if(shift < (problem.getNumShifts() - 1 - hoursBetweenShifts)){
-            for(int i = 1; i < hoursBetweenShifts + 1; i++){
-                neighbors.add(shift + i);
-                if((shift - i) >= 0){
-                    neighbors.add(shift - i);
-                }
-                else{
-                    break; //once an assignment is too close to a boundary it doesn't need to both checking anything further
-                }
-            }
-        }
-        //Checks if the current shift is near the end
-        else if(shift > (hoursBetweenShifts - 1)){
-            for(int i = 1; i < hoursBetweenShifts + 1; i++){
-                neighbors.add(shift - i);
-                if((shift + i) <= problem.getNumShifts() - 1){
-                    neighbors.add(shift + i);
-                }
-                else{
-                    break;
-                }
-            }
-        }
-        else{ //The number of shifts is too low so add all neighbors
-            for(int i = 0; i < problem.getNumShifts(); i++){
-                if(shift != i){
-                    neighbors.add(i);
-                }
-            }
-        }
-
-        return neighbors;
-    }//end getNeighbors
-
-
-
-
    //Returns a list of neighboring shifts. This assumes time between shifts is greater than the longest allowable shift 
    private static ArrayList<Integer> getForwardNeighbors(SchedulingProblem problem, int shift){
 

@@ -16,7 +16,7 @@ public class Solver {
 
         System.out.println(startDomains); //for testing
 
-
+        /*
         //Begin instance of Jackson's backtracking MRV search
         ArrayList<Integer> assignedShifts = new ArrayList<>();
         //initialize assignedShifts to allow setting each hour
@@ -32,7 +32,7 @@ public class Solver {
         else{
             System.out.println("No solution found for backtracking MRV");
         }
-
+        */
         
         //Begin instance of Andrew's simple backtracking search using PC2
         int firstHour = 0;
@@ -55,8 +55,8 @@ public class Solver {
 
 
     public static void main(String[] args) throws IOException{
-       // runInstance(10,5, "5E 10S.txt");
-        runInstance(25, 10, "10E 25S.txt");
+       runInstance(10,5, "5E 10S.txt");
+        //runInstance(25, 10, "10E 25S.txt");
     }
 
 
