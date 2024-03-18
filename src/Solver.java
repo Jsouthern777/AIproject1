@@ -138,13 +138,18 @@ public class Solver {
 
 
     public static void main(String[] args) throws IOException{
-        runInstance(10,5, "5E 10S.txt",  0);
-        runInstance(25, 10, "10E 25S.txt",0);
+        runInstance(10,5, "5E 10S.txt", 0);
+        runInstance(10, 5, "5E 10S.txt", 4, 3, 0);
+        //runInstance(25, 10, "10E 25S.txt",0);
         runInstance(25, 10, "10E 25S.txt", 6, 3,0);
-        runInstance(25, 10, "10E 25S.txt", 12, 2,0);  //should fail
-        runInstance(50, 15, "15E 50S.txt",0);
+        //runInstance(25, 10, "10E 25S.txt", 12, 2,0);  //should fail
+        //runInstance(50, 15, "15E 50S.txt",0);
         //runInstance(100, 30, "30E 100S.txt"); //will run but PC2 is very slow
         //runInstance(200, 30, "30E 200S.txt"); //will run but PC2 is very slow
+        //runInstance(10, 5, "5E 10S_2.txt", 0);
+        //runInstance(25, 10, "10E 25S_2.txt", 0);
+        //runInstance(50, 15, "15E 50S_2.txt", 0);
+
     }
 
 
